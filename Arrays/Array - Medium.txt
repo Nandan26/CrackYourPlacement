@@ -1,0 +1,454 @@
+Q- 10 :- Subarray Sum divisible by K
+class Solution {
+    public int subarraysDivByK(int[] nums, int K) {
+        if(K==0 || nums.length==0) return 0;
+        
+        int cnt=0;
+        int rem=0;
+        HashMap<Integer,Integer> map=new HashMap<>();
+        
+        map.put(0,1);
+        
+        for(int i=0;i<nums.length;i++){
+            rem+=nums[i];
+            int tmp=rem%K;
+            
+            if(tmp<0) tmp+=K;
+            if(map.containsKey(tmp)){
+                cnt+=map.get(tmp);
+            }
+            map.put(tmp,map.getOrDefault(tmp,0)+1);
+        }
+        return cnt;
+    }
+} 
+
+Q- 11 :- Find All Duplicates in array
+class Solution {
+    private void swap(int arr[],int i,int j){
+        int temp=arr[i];
+        arr[i]=arr[j];
+        arr[j]=temp;
+    }
+    public List<Integer> findDuplicates(int[] nums) {
+        int i=0;
+        List<Integer> ans=new ArrayList<>();
+        while(i<nums.length){
+            int correct=nums[i]-1;
+            if(nums[i]!=nums[correct]){
+                swap(nums,i,correct);
+            }
+            else i++;
+        }
+        
+        for(i=0;i<nums.length;i++){
+            if(nums[i]!=i+1){
+                ans.add(nums[i]);
+            }
+
+        }
+        return ans;
+    }
+}
+
+Q-12 :- Container With Most Water
+class Solution {
+    public int maxArea(int[] height) {
+        int max = 0;
+        int low = 0;
+        int left = 0;
+        int right = height.length - 1;
+        while (left < right) {
+            low = Math.min(height[left], height[right]);
+            max = Math.max(max, low * (right - left));
+            if (height[left] > height[right]){
+                right--;
+            } 
+            else left++;
+        }
+        
+        return max;
+    }
+}
+
+Q-13 :- 3 Sum
+class Solution {
+    public List<List<Integer>> threeSum(int[] num) {
+        
+        Arrays.sort(num);
+        
+        List<List<Integer>> res = new LinkedList<>(); 
+        
+        for (int i = 0; i < num.length-2; i++) {
+            
+            if (i == 0 || (i > 0 && num[i] != num[i-1])) {
+                
+                int lo = i+1, hi = num.length-1, sum = 0 - num[i];
+                
+                while (lo < hi) {
+                    if (num[lo] + num[hi] == sum) {
+                        
+                        res.add(Arrays.asList(num[i], num[lo], num[hi]));
+                        
+                        while (lo < hi && num[lo] == num[lo+1]) lo++;
+                        while (lo < hi && num[hi] == num[hi-1]) hi--;
+                        
+                        lo++; hi--;
+                    } 
+                    else if (num[lo] + num[hi] < sum) lo++;
+                    
+                    else hi--;
+               }
+            }
+        }
+        return res;
+    }
+} 
+
+
+Q-14 :- 4 Sum
+class Solution {
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+           int n = nums.length;
+           Arrays.sort(nums);
+
+           List<List<Integer>> ans = new ArrayList<>();
+
+           for(int i=0;i<n-3;i++){
+                 if(i!=0 && nums[i] == nums[i-1]){
+                       continue;
+                 }
+
+                 for(int j=i+1;j<n-2;j++){
+
+                       if(nums[j]==nums[j-1] && j!=i+1)
+                             continue;
+
+                       int lo = j+1;
+                       int hi = n-1;
+                       int sum;
+                       while(lo < hi){
+                             sum = nums[i]+nums[j]+nums[lo]+nums[hi];
+                             if(sum < target){
+                                   lo++;
+                             }else if(sum > target){
+                                   hi--;
+                             }else {
+                                   List<Integer> temp = new ArrayList<>();
+                                   temp.add(nums[i]);
+                                   temp.add(nums[j]);
+                                   temp.add(nums[lo]);
+                                   temp.add(nums[hi]);
+                                   ans.add(temp);
+
+                                   lo++;
+                                   hi--;
+
+                                   while (lo<hi && nums[lo] == nums[lo-1]) lo++;
+                                   while(lo<hi && nums[hi] == nums[hi+1]) hi--;
+
+                             }
+                       }
+                 }
+           }return ans;
+
+    }
+}
+
+Q-15 :- Max Points you obtain from card
+class Solution {
+    public int maxScore(int[] cardPoints, int k) {
+        int n = cardPoints.length;
+        int ls = 0, rs = 0;
+        
+        for(int i = 0; i < k; i++) ls += cardPoints[i];
+
+        int ans = ls;
+        
+        for(int i = 0; i < k; i++){
+            ls -= cardPoints[k - i - 1];
+            rs += cardPoints[n - i - 1];
+            result = Math.max(ls + rs, result);
+        }
+        
+        return ans;
+    }
+}
+
+Q-16 :- Subarray Sum equals K
+class Solution {
+    public int maxScore(int[] cardPoints, int k) {
+        int n = cardPoints.length;
+        int ls = 0, rs = 0;
+        
+        for(int i = 0; i < k; i++) ls += cardPoints[i];
+
+        int ans = ls;
+        
+        for(int i = 0; i < k; i++){
+            ls -= cardPoints[k - i - 1];
+            rs += cardPoints[n - i - 1];
+            result = Math.max(ls + rs, result);
+        }
+        
+        return ans;
+    }
+    
+}
+
+Q-17 :- Spiral Matrix
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> res = new ArrayList<Integer>();
+        //if(matrix.length == 0 || matrix[0].length == 0) return res;
+        
+        int maxrow = matrix.length-1;
+        int minrow=0,mincol=0;
+        int maxcol = matrix[0].length-1;
+        int cnt=0;
+        int total=matrix[0].length*matrix.length;
+        while(cnt<total){
+            for(int i = minrow,j=mincol; j <= maxcol && cnt<total; j++){
+                res.add(matrix[i][j]);
+                cnt++;
+            } 
+            minrow++;
+            
+            for(int i = minrow,j=maxcol; i <= maxrow && cnt<total; i++){
+                res.add(matrix[i][j]);
+                cnt++;
+            } 
+            maxcol--;
+            
+            for(int i = maxrow,j=maxcol; j >= mincol && cnt<total; j--){
+                res.add(matrix[i][j]);
+                cnt++;
+            } 
+            maxrow--;
+
+            
+            for(int i = maxrow,j=mincol; i >= minrow && cnt<total; i--){
+                res.add(matrix[i][j]);
+                cnt++;
+            } 
+            mincol++;
+        }
+        
+        return res;
+    }
+    
+}
+
+Q-18 Word Search
+class Solution {
+    public boolean exist(char[][] b, String word) {
+        for(int i=0; i<b.length; i++)
+            for(int j=0; j<b[0].length; j++)
+                if(b[i][j]==word.charAt(0) && helper(b,word,0,i,j))
+                    return true;
+        
+        return false;
+    }
+    
+    public boolean helper(char[][] b, String word, int poss, int r, int c){
+
+        if(word.length() <= poss)
+            return true;
+        
+        if(r<0 ||c<0 || r>=b.length || c>=b[0].length || b[r][c]=='1' || b[r][c]!=word.charAt(poss))
+            return false;
+        
+        char tmp = b[r][c];
+        b[r][c] = '1';
+        
+        if(helper(b,word,poss+1,r+1,c) ||
+          helper(b,word,poss+1,r-1,c) ||
+          helper(b,word,poss+1,r,c+1) ||
+          helper(b,word,poss+1,r,c-1))
+            return true;
+
+        b[r][c] = tmp;
+        
+        return false;
+    }
+}
+
+Q-19 :- Jump Game
+class Solution {
+    public boolean canJump(int[] nums) {
+       if(nums.length < 2) return true;
+       
+       for(int i = nums.length-2; i>=0;i--){
+           if(nums[i] == 0){
+               int neededJumps = 1;
+               while(neededJumps > nums[i]){
+                   neededJumps++;
+                   i--;
+                   if(i < 0) return false;
+               }
+           }
+       }
+       return true;
+    }
+}
+
+Q-20 :- Merge Sorted Arrays
+class Solution {
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        for(int i=m;i<m+n;i++){
+            nums1[i]=nums2[i-m];
+        }
+        Arrays.sort(nums1);
+        
+    }
+}
+
+Q-21 :- Majority Element
+class Solution {
+    public int majorityElement(int[] nums) {
+        int count = 0;
+        int candidate = 0;
+
+        for (int num : nums) {
+            if (count == 0) {
+                candidate = num;
+            }
+            if(num==candidate) count += 1; 
+            else count -= 1; 
+        }
+
+        return candidate;
+    }
+}
+
+Q-22 :- Reverse Pairs
+class Solution {
+    
+    private int merge(int[] nums, int low, int mid, int high) {
+        int cnt = 0;
+        int j = mid + 1; 
+        for(int i = low;i<=mid;i++) {
+            while(j<=high && nums[i] > (2 * (long)nums[j])) {
+                j++;
+            }
+            cnt += (j - (mid+1));
+        }
+        
+        ArrayList<Integer> temp = new ArrayList(); 
+        int left = low, right = mid+1; 
+        while(left <= mid && right<=high) {
+            if(nums[left]<=nums[right]) {
+                temp.add(nums[left++]); 
+            }
+            else {
+                temp.add(nums[right++]); 
+            }
+        }
+        
+        while(left<=mid) {
+            temp.add(nums[left++]); 
+        }
+        while(right<=high) {
+            temp.add(nums[right++]); 
+        }
+        
+        for(int i = low; i<=high;i++) {
+            nums[i] = temp.get(i - low); 
+        }
+        return cnt; 
+    }
+    private int mergeSort(int[] nums, int low, int high) {
+        if(low>=high) return 0; 
+        int mid = (low + high) / 2;
+        int inv = mergeSort(nums, low, mid); 
+        inv += mergeSort(nums, mid+1, high); 
+        inv += merge(nums, low, mid, high); 
+        return inv; 
+    }
+    public int reversePairs(int[] nums) {
+        return mergeSort(nums, 0, nums.length - 1); 
+    }
+}
+
+Q-23 :- Print all possible combinations of r elements in a given array of size n
+
+class Solution{
+ 
+    private int[] combinationHelper(int arr[], int n, int r, int index,
+                                int data[], int i)
+    {
+
+        if (index == r)
+        {
+        	return data;
+        }
+
+        if (i >= n)
+        return;
+
+        data[index] = arr[i];
+        combinationHelper(arr, n, r, index+1, data, i+1);
+
+        combinationHelper(arr, n, r, index, data, i+1);
+    }
+
+    public int[] printCombination(int arr[], int n, int r)
+    {
+
+        int data[]=new int[r];
+
+        combinationHelper(arr, n, r, 0, data, 0);
+    }
+}
+
+Q-24 :- Game of Life
+class Solution {
+    private int die = 2;
+    private int live = 3;
+    public void gameOfLife(int[][] board) {
+        int rows = board.length;
+        int cols = board[0].length;
+        for (int i=0;i<rows;i++){
+            for (int j=0;j<cols;j++){
+                int around = livecells(i,j,board);
+                if (board[i][j] == 0 && around == 3)
+                    board[i][j] = live;
+                else if (board[i][j] == 1){
+                    if (around == 2 || around ==3)
+                        continue;
+                    if (around < 2 || around > 3)
+                        board[i][j] = die;
+                }
+            }
+        }
+        
+          for (int i=0;i<rows;i++){
+            for (int j=0;j<cols;j++){
+                 if (board[i][j] == die)
+                     board[i][j] = 0;
+                 if (board[i][j] == live)
+                     board[i][j] = 1;
+                }
+            }
+        
+    }
+    
+    private int livecells(int i, int j,int[][] board){
+        int count = 0;
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+        
+        for (int[] dir:dirs){
+            int x = i+dir[0];
+            int y = j+dir[1];
+            
+            if (x>=0 && y>=0 && x < board.length && y<board[0].length ){
+                //it means current state is die and it changed so previous state must be live therefore increase the count
+                if (board[x][y] == 1 || board[x][y] == die)
+                    count ++;
+            }
+        }
+        
+        return count;
+        
+    }
+} 
