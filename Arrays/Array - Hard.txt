@@ -1,0 +1,157 @@
+Q-25 :- Max Value of Equation
+class Solution {
+	public int findMaxValueOfEquation(int[][] points, int k) {
+		Deque<int[]> deque = new LinkedList<>();
+		int res = Integer.MIN_VALUE;
+        
+		for (int[] point : points) {
+			int x_j = point[0];
+            		int y_j = point[1];
+            
+			
+			while (!deque.isEmpty() && x_j - deque.peekFirst()[0] > k)
+                		deque.pollFirst();
+            
+			
+            		int sum_j = x_j + y_j;
+            
+			if (!deque.isEmpty())
+                		res = Math.max(res, deque.peekFirst()[1] + sum_j);
+            
+			
+		        int diff_j = y_j - x_j;
+            
+            
+			while (!deque.isEmpty() &&  diff_j > deque.peekLast()[1])
+                		deque.pollLast();
+            
+			
+            		deque.offerLast(new int[]{x_j, diff_j});
+        	}
+        
+		return res;
+    	}
+} 
+
+Q-26 :- Insert Delete GetRandom O(1)
+class RandomizedCollection {
+
+    HashMap<Integer , HashSet<Integer>> map;
+    ArrayList<Integer> list;
+    Random r;
+    
+    public RandomizedCollection() {
+        list= new ArrayList<>();
+        map= new HashMap<>();
+        r= new Random();
+    }
+
+    public boolean insert(int val) {
+        list.add(val);
+        if(map.containsKey(val)){
+
+            HashSet<Integer>set = map.get(val);
+            set.add(list.size()-1);
+
+            return false;
+        }else{
+            HashSet<Integer> set = new HashSet<>();
+            set.add(list.size()-1);
+            map.put(val , set);
+            return true;
+        }
+    }
+
+    public boolean remove(int val) {
+        if(map.containsKey(val)){
+
+            int vidx = map.get(val).iterator().next(); 
+            int lidx = list.size()-1;
+            int lval = list.get(lidx);
+
+            list.set(lidx , val);
+            list.set(vidx, lval);
+
+            list.remove(lidx);
+            map.get(val).remove(vidx);
+
+            if(map.get(val).size()==0){
+                map.remove(val);
+            }
+
+            if(map.containsKey(lval)){
+                map.get(lval).remove(lidx);
+                map.get(lval).add(vidx);
+            }
+
+            return true;
+        }else{
+
+
+            return false;
+        }
+    }
+
+    public int getRandom() {
+        int idx= r.nextInt(list.size());
+        return list.get(idx);
+    }
+}
+
+Q -27 :- Largest Rectangle in Histrogram
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        Stack<Integer> st=new Stack<>();
+        int max=Integer.MIN_VALUE;
+        for(int i=0;i<=n;i++){
+            while(!st.empty() && (i==n || heights[st.peek()]>=heights[i])){
+                int height=heights[st.peek()];
+                st.pop();
+                int width;
+                if(st.empty()) width=i;
+                else width= i-st.peek()-1;
+                max=Math.max(max,width*height);
+            }
+            st.push(i);
+            
+        }
+        return max;
+        
+    }   
+}
+
+Q-28 :- Max Value of Equation
+class Solution {
+	public int findMaxValueOfEquation(int[][] points, int k) {
+		Deque<int[]> deque = new LinkedList<>();
+		int res = Integer.MIN_VALUE;
+        
+		for (int[] point : points) {
+			int x_j = point[0];
+            		int y_j = point[1];
+            
+			
+			while (!deque.isEmpty() && x_j - deque.peekFirst()[0] > k)
+                		deque.pollFirst();
+            
+			
+            		int sum_j = x_j + y_j;
+            
+			if (!deque.isEmpty())
+                		res = Math.max(res, deque.peekFirst()[1] + sum_j);
+            
+			
+		        int diff_j = y_j - x_j;
+            
+            
+			while (!deque.isEmpty() &&  diff_j > deque.peekLast()[1])
+                		deque.pollLast();
+            
+			
+            		deque.offerLast(new int[]{x_j, diff_j});
+        	}
+        
+		return res;
+    	}
+} 
