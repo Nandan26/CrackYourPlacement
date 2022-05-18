@@ -1,0 +1,90 @@
+Q-10 :- Max points in line
+class Solution {
+    public int maxPoints(int[][] points) {
+        if (points == null) return 0;
+        
+        int length = points.length;
+        
+        
+        if (length <= 2) 
+            return length; //two points always makes a line
+        
+        Map<Double, Integer> map;
+        int ans = 0;
+        
+        for (int i = 0;i<points.length;i++){
+            map = new HashMap<>();
+            int similar=0;
+            int cnt = 1;
+                                
+            int x1 = points[i][0];
+            int y1 = points[i][1];
+            for (int j = 0;j<points.length;j++){
+                
+                if(j != i){
+
+
+                    int x2 = points[j][0];
+                    int y2 = points[j][1];
+                    
+                    if (x1 == x2 && y1 == y2){ 
+                        similar++;
+                        continue;
+                    }
+
+                    if (x1 == x2) {
+                        cnt++;                    
+                        continue;
+                    }
+
+                    double k = (double)(y2 - y1) / (double)(x2 - x1);
+                    
+                    map.put(k, map.getOrDefault(k, 1)+1);
+
+                    ans = Math.max(ans, map.get(k) + similar);
+                }
+            }
+
+            ans = Math.max(ans, cnt);
+        }
+        return ans;
+    }
+}
+
+Q-11 :- Valid Square
+class Solution {
+    public boolean validSquare(int[] p1, int[] p2, int[] p3, int[] p4) {
+        int s = d2(p1, p2);
+        if (s == 0) return false;  
+
+        if (!isValid(s, d2(p1, p3))) return false;
+        if (!isValid(s, d2(p1, p4))) return false;
+        if (!isValid(s, d2(p2, p3))) return false;
+        if (!isValid(s, d2(p2, p4))) return false;
+        if (!isValid(s, d2(p3, p4))) return false;
+        return true;
+    }
+
+    private boolean isValid(int s, int t) {
+        return (s == t) || (s * 2 == t) || (t * 2 == s);
+    }
+
+    private int d2(int[] p, int[] q) {
+        return (q[0] - p[0]) * (q[0] - p[0]) + (q[1] - p[1]) * (q[1] - p[1]);
+    }
+}
+
+Q-12 :- The Kth factor of N
+class Solution {
+    public int kthFactor(int n, int k) {
+        for(int i=1;i<=n/2;i++){
+            if(n % i == 0)
+               k--;
+            if(k == 0)
+                return i;
+        }
+        if(k == 1)
+            return n;
+        return -1;
+    }
+}
