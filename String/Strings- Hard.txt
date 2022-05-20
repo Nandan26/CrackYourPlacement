@@ -1,0 +1,325 @@
+Q-15 :- Valid Number
+class Solution {
+    private  boolean ValidChar(char ch) {
+		return ch >= 48 && ch <= 57 || ch == 'e' || ch == 'E' || ch == '.' || ch == '+' || ch == '-';
+	}
+    public boolean isNumber(String s) {
+
+		if (s.length() < 1)
+			return false;
+
+		boolean hasDigit = false, d = false, e = false;
+		int cnts = 0;
+
+		for (int i = 0; i < s.length(); i++) {
+			
+            char ch = s.charAt(i);
+
+			if (ValidChar(ch) == false)
+			    return false;
+
+
+			if (ch >= '0' && ch <= '9')
+				hasDigit = true;
+
+
+			else if (ch == '+' || ch == '-') {
+
+				if (cnts > 1)
+					return false;
+                
+
+				if (i > 0 && !(s.charAt(i - 1) == 'e' || s.charAt(i - 1) == 'E')) {
+			        return false;
+                }
+
+				if (i == s.length() - 1)
+					return false;
+	
+                cnts++;
+			}
+
+			 else if (ch == '.') {
+
+				if (d || e)
+					return false;
+
+				if (i == s.length() - 1 && !hasDigit)
+					return false;
+
+				d = true;
+			}
+
+			else if (ch == 'e' || ch == 'E' ) {
+
+				if (e || !hasDigit)
+					return false;
+                
+				if (i == s.length() - 1 || i == 0)
+					return false;
+
+				e = true;
+			}
+            
+
+		}
+		return true;        
+    }
+
+}
+
+Q-16 :- Intger to English Word
+class Solution {
+    
+    final private static String[] singled={"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+    final private static String[] twod={"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+    final private static String[] threed={"AAA", "BBB", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+    final private static String[] zeros={"", "Thousand", "Million", "Billion", "Trillion", "Quadrillion", "Zillion", "Gazillion", "Shmazillion", "Abracadabrazillion"};
+    
+    final private Stack<String> st = new Stack<>();
+    
+    public String numberToWords(int num) {
+        
+        int ord=0;
+        if (num==0)
+            return singled[0];
+        while (num>0) {
+            processNum(num%1000,ord);
+            num/=1000;
+            ord++;
+        }
+        
+        StringBuilder sb=new StringBuilder();
+        while (!st.empty()) {
+            if (sb.length()>0)
+                sb.append(" ");
+            sb.append(st.pop());
+        }
+        return sb.toString();
+    }
+
+    private void processNum(int num, int ord) {
+        if (ord>0 && num>0)
+            st.push(zeros[ord]);
+        if (num<10) {
+            if (num>0)
+                st.push(singled[num]);
+            return;
+        }
+        if (num<20) {
+            st.push(twod[num%10]);
+            return;
+        }
+        if (num<100) {
+            if (num%10>0)
+                st.push(singled[num%10]);
+            st.push(threed[num/10]);
+            return;
+        }
+        //100~999 here
+        int rem=num%100;
+        if (rem<10){
+            if (rem>0)
+                st.push(singled[rem]);
+        }
+        else if (rem<20)
+            st.push(twod[rem%10]);
+        else {
+            if (rem%10>0)
+                st.push(singled[rem%10]);
+            st.push(threed[rem/10]);
+        }
+        rem=num/100;
+        st.push("Hundred");
+        st.push(singled[rem]);
+    }
+}
+
+Q-17 :- Minimum Window Substring
+class Solution {
+    public String minWindow(String s, String t) {
+        String ans = "";
+        if(t.length()>s.length()) return ans;
+        if(s.equals(t)) return s;
+		Map<Character, Integer> map = new HashMap<>();
+		for (char ch : t.toCharArray()) {
+			map.put(ch, map.getOrDefault(ch, 0) + 1);
+		}
+		int size = map.size();
+		
+		int i = 0;
+		int j = 0;
+		while (j < s.length()) {
+			if (map.containsKey(s.charAt(j))) {
+				char ch = s.charAt(j);
+				map.put(ch, map.get(ch) - 1);
+				if (map.get(ch) == 0) {
+					size--;
+				}
+			}
+            j++;
+			if (size == 0) {
+				while(size ==0  && i < j) {
+					String temp = s.substring(i, j);
+					if (ans == "" || temp.length() < ans.length()) {
+						ans = temp;
+					}
+					if (map.containsKey(s.charAt(i))) {
+						map.put(s.charAt(i), map.get(s.charAt(i)) + 1);
+						if ( map.get(s.charAt(i)) > 0) {
+							size++;
+						}
+					}
+					i++;
+				}
+			}
+            
+		}
+		return ans;
+	}
+}
+
+Q-18 :- Text Justification
+class Solution {
+    List<String> ans = new ArrayList<>();
+    
+    public List<String> fullJustify(String[] words, int maxWidth) {
+        
+        int i = 0;
+        
+        while(i < words.length) {
+            StringBuilder sb = new StringBuilder();
+            List<String> arr = new ArrayList<>();
+            arr.add(words[i]);
+            int len = words[i].length();
+            int j = i + 1;
+            
+            while(j < words.length && len + words[j].length() + arr.size() <= maxWidth) {
+                len += words[j].length();
+                arr.add(words[j]);
+                j++;
+            }
+            
+            if(j >= words.length) {
+                sb.append(arr.get(0));
+                for(int k = 1; k < arr.size(); k++) {
+                    sb.append(" ");
+                    sb.append(arr.get(k));
+                }
+                addPaddings(sb, maxWidth - sb.length());
+                ans.add(sb.toString());
+                i = j;
+            }
+            
+            else if(arr.size() == 1) {
+                sb.append(arr.get(0));
+                addPaddings(sb, maxWidth - arr.get(0).length());
+                ans.add(sb.toString());
+                i++;
+            }
+            
+            else {
+                int r = (maxWidth - len) % (arr.size() - 1);
+                sb.append(arr.get(0));
+                for(int k = 1; k < arr.size(); k++) {
+                    addPaddings(sb, (maxWidth - len) / (arr.size() - 1));
+                    if(r > 0) {
+                        sb.append(" ");
+                        r--;
+                    }
+                    sb.append(arr.get(k));
+                }
+                ans.add(sb.toString());
+                i = i + arr.size();
+            }
+        }
+        
+        return ans;
+    }
+    
+    private void addPaddings(StringBuilder sb, int noofspace) {
+        for(int i = 0; i < noofspace; i++) {
+            sb.append(" ");
+        }
+    }
+}
+
+Q-19 :- Boyer Moore Algorithm for Pattern Searching
+
+class Solution{
+     
+     static int NO_OF_CHARS = 256;
+
+     static int max (int a, int b) { 
+         return (a > b)? a: b; 
+     }
+ 
+     static void badCharHeuristic( char []str, int size,int badchar[])
+     {
+
+        for (int i = 0; i < NO_OF_CHARS; i++)
+           badchar[i] = -1;
+ 
+
+        for (int i = 0; i < size; i++)
+           badchar[(int) str[i]] = i;
+        }
+ 
+    static void search( char txt[],  char pat[])
+    {
+        int m = pat.length;
+        int n = txt.length;
+ 
+        int badchar[] = new int[NO_OF_CHARS];
+
+        badCharHeuristic(pat, m, badchar);
+
+        int s = 0;  
+        while(s <= (n - m))
+        {
+            int j = m-1;
+
+
+            while(j >= 0 && pat[j] == txt[s+j])
+                j--;
+
+            if (j < 0)
+            {
+                System.out.println("Patterns occur at shift = " + s);
+
+                s += (s+m < n)? m-badchar[txt[s+m]] : 1;
+
+            }
+
+            else
+                s += max(1, j - badchar[txt[s+j]]);
+
+                  
+        }
+    }
+    public static void main(String []args) {
+         
+         char txt[] = "ABAAABCD".toCharArray();
+         char pat[] = "ABC".toCharArray();
+         search(txt, pat);
+    }
+}
+
+Q-20 :- Distinct Subsequences
+class Solution {
+    public int numDistinct(String s, String t) {
+        int m = s.length();
+        int n = t.length();
+        
+        int[] dp=new int[n+1];
+        dp[0] = 1;
+        
+        for(int i=1; i<=m; i++){
+            for(int j=n; j>=1; j--){
+                if(s.charAt(i-1) == t.charAt(j-1))
+                    dp[j] = dp[j-1] + dp[j];
+            }
+        }
+        return dp[n];
+    }
+}
