@@ -1,0 +1,93 @@
+Q-1 :- Permute two arrays such that sum of every pair is greater or equal to K
+class Solution
+{
+
+	public boolean isPossible(Integer a[], int b[],int n, int k)
+    {
+        Arrays.sort(a);
+
+    	Arrays.sort(b, Collections.reverseOrder());
+ 
+    
+    	for (int i = 0; i < n; i++){
+	    	if (a[i] + b[i] < k)
+        		return false;
+        	}
+    
+        	return true;
+    	}
+    }
+}
+
+Q-2 :- Celing in sorted array
+class Solution
+{
+    public int ceilSearch(int arr[], int low, int high, int x)
+    {
+
+      if(n == 0){
+        return -1;
+      } 
+        while(low <= high){
+            int mid = low + (high - low)/2;
+
+            if(x == arr[mid]){
+                return mid;
+            }
+            else if( x < arr[mid]){
+                high = mid -1;
+            }
+
+            else{
+                low = mid + 1;
+            }
+      }
+      return low;
+    }
+}
+
+Q-3 :- Find a pair with given difference
+class Solution
+{
+    public boolean findPair(int arr[], int size, int n)
+    {
+        
+        HashMap<Integer,Integer> mpp = new HashMap<Integer,Integer>();
+ 
+
+        for(int i = 0; i < size; i++)
+        {
+
+            mpp.put(arr[i],mpp.getOrDefault(arr[i], 0) + 1);
+        }
+  
+ 
+        for (int i = 0; i < size; i++) {
+            if (mpp.containsKey(n + arr[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+Q-4 :- Permute two arrays such that sum of every pair is greater or equal to K
+class Solution
+{
+
+    public boolean isPossible(Integer a[], int b[],int n, int k)
+    {
+        Arrays.sort(a);
+
+    	Arrays.sort(b, Collections.reverseOrder());
+ 
+    
+    	for (int i = 0; i < n; i++){
+	    	if (a[i] + b[i] < k)
+        		return false;
+        	}
+    
+        	return true;
+    	}
+    }
+}

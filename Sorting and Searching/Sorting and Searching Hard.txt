@@ -1,0 +1,246 @@
+Q-10 :- Allocate Minimum number of pages
+class Solution 
+{
+    //Function to find minimum number of pages.
+    public static int findPages(int[] A,int N,int M)
+    {
+        //Your code here
+        if (M > n) return -1;
+        int low = A[0];
+        int high = 0;
+        for (int i = 0; i < N; i++) {
+            high = high + A[i];
+            low = Math.min(low, A[i]);
+        }
+        int res = -1;
+        while (low <= high) {
+            int mid = (low + high) >> 1;
+            
+            if (isPossible(A, mid, M)) {
+                res = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return low;
+        
+    }
+    static boolean isPossible(int[] A, int pages, int students) {
+        int cnt = 0;
+        int sumAllocated = 0;
+        for (int i = 0; i < A.length; i++) {
+            if (sumAllocated + A[i] > pages) {
+                cnt++;
+                sumAllocated = A[i];
+                if (sumAllocated > pages) return false;
+            } else {
+                sumAllocated += A[i];
+            }
+        }
+        if (cnt < students) return true;
+        return false;
+    }
+}
+
+Q-11 :- Minimum number of swaps required to sort an array
+class Solution
+{
+
+    public int minSwaps(int[] arr, int N)
+    {
+ 
+        int ans = 0;
+        int[] temp = new int[N];
+        for (int i = 0; i < N; i++)
+        {
+            temp[i]=arr[i];
+        }
+
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+ 
+        Arrays.sort(temp);
+        for (int i = 0; i < N; i++)
+        {
+            h.put(arr[i], i);
+        }
+        for (int i = 0; i < N; i++)
+        {
+
+            if (arr[i] != temp[i])
+            {
+                ans++;
+                int curr = arr[i];
+
+                swap(arr, i, h.get(temp[i]));
+ 
+
+                h.put(curr, h.get(temp[i]));
+                h.put(temp[i], i);
+            }
+        }
+        return ans;
+    }
+    private void swap(int[] arr, int i, int j)
+    {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+}
+
+Q-12 :- Aggressive Cows
+class Solution {
+    static boolean isPossible(int a[], int n, int cows, int minDist) {
+        int cntCows = 1;
+        int lastPlacedCow = a[0];
+        for (int i = 1; i < n; i++) {
+            if (a[i] - lastPlacedCow >= minDist) {
+                cntCows++;
+                lastPlacedCow = a[i];
+            }
+        }
+        if (cntCows >= cows) return true;
+        return false;
+    }
+    public static int AggressiveCows(int[] a,int N,int cows){
+        //Your code here
+        if (cows > n) return -1;
+
+        Arrays.sort(a);
+
+        int low = 1, high = a[n - 1] - a[0];
+
+        while (low <= high) {
+            int mid = (low + high) >> 1;
+
+            if (isPossible(a, n, cows, mid)) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return high;
+    }
+}
+
+Q-13 :- Search in rotated sorted array
+class Solution {
+    public int search(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        while (start <= end){
+            int mid = (start + end) / 2;
+            if (nums[mid] == target)
+                return mid;
+        
+            if (nums[start] <= nums[mid]){
+                 if (target < nums[mid] && target >= nums[start]) 
+                    end = mid - 1;
+                 else
+                    start = mid + 1;
+            } 
+        
+            if (nums[mid] <= nums[end]){
+                if (target > nums[mid] && target <= nums[end])
+                    start = mid + 1;
+                 else
+                    end = mid - 1;
+            }
+        }
+        return -1;
+    }
+}
+
+Q-14 :- Count of Smaller Numbers After Self
+class Solution {
+    class TreeNode {
+        TreeNode left; 
+        TreeNode right;
+        int val;
+        int smallerele = 1;
+        public TreeNode(int val) {
+            this.val = val;
+        }
+    }
+	public List<Integer> countSmaller(int[] nums) {
+		if(nums == null || nums.length == 0) return null;
+        
+        int n = nums.length;
+        List<Integer> ans = new ArrayList<>();
+		
+		TreeNode root = new TreeNode(nums[n - 1]);
+		ans.add(0);
+		for(int i = n - 2; i >= 0; i--) {
+			int cnt = insert(root, nums[i]);
+			ans.add(cnt);
+		}
+		Collections.reverse(ans);
+		return ans;
+	}
+
+	public int insert(TreeNode root, int val) {
+		int smaller = 0;
+		while(true) {
+			if(val <= root.val) {
+				root.smallerele++;
+				if(root.left == null) {
+					root.left = new TreeNode(val); 
+                    			break;
+				} else {
+					root = root.left;
+				}
+			} 
+            		else {
+				smaller += root.smallerele;
+				if(root.right == null) {
+					root.right = new TreeNode(val); 
+                    			break;
+				} else {
+					root = root.right;
+				}
+			}
+		}
+		return smaller;
+	}
+}
+
+Q-15 :- Split array largest sum
+class Solution {
+    public int splitArray(int[] nums, int m) {
+        int low = 0, high = 0;
+        for(int num: nums){
+            if(num > low){
+                low = num;
+            }
+            high += num;
+        }
+        
+        while (low <= high){
+            int mid = low + (high - low) / 2;
+            if(isPossible(nums, m, mid)){
+                high = mid - 1;
+            }else{
+                low = mid + 1;
+            }
+        }
+        return low;
+    }
+    
+    private boolean isPossible(int[] nums, int m, int val){
+        
+        int n = 0, curr = 0;
+        for(int num: nums){
+            curr += num;
+            if(curr > val){
+                ++n;
+                curr = num;
+            }
+        }
+        if(curr > 0){
+            ++n;
+        }
+        return n <= m;
+    }
+}

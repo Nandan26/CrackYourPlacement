@@ -1,0 +1,165 @@
+Q-5 :- Check if reversing a sub array make the array sorted
+class Solution {
+ 
+    public boolean checkReverse(int arr[], int n) {
+        
+        int tmp[] = new int[n];
+        for (int i = 0; i < n; i++) {
+            tmp[i] = arr[i];
+        }
+ 
+        Arrays.sort(tmp);
+ 
+        int f;
+        for (f = 0; f < n; f++) {
+            if (tmp[f] != arr[f]) {
+                break;
+            }
+        }
+ 
+        int b;
+        for (b = n - 1; b >= 0; b--) {
+            if (tmp[b] != arr[b]) {
+                break;
+            }
+        }
+ 
+        if (f >= b) {
+            return true;
+        }
+ 
+
+        do {
+            f++;
+            if (arr[f - 1] < arr[f]) {
+                return false;
+            }
+        } while (f != b);
+ 
+        return true;
+    }
+}
+  
+Q-6 :- Radix Sort
+class Solution {
+
+    private void countingSort(int[] arr, int n, int k) {
+        int[] tmp = new int[n + 1];
+        int max = arr[0];
+        for (int i = 1; i < n; i++) {
+          if (arr[i] > max)
+            max = arr[i];
+        }
+        int[] count = new int[max + 1];
+
+        for (int i = 0; i < max; ++i){
+            count[i] = 0;
+        }
+
+        for (int i = 0; i < n; i++){
+            count[(arr[i] / k) % 10]++;    
+        }
+         
+        for (int i = 1; i < 10; i++){
+            count[i] += count[i - 1];
+        }
+          
+
+        for (int i = n - 1; i >= 0; i--) {
+          tmp[count[(arr[i] / k) % 10] - 1] = arr[i];
+          count[(arr[i] / k) % 10]--;
+        }
+
+        for (int i = 0; i < n; i++){
+            arr[i] = tmp[i];
+        }
+
+    }
+    private int getMax(int[] arr, int n) {
+        int max = arr[0];
+        for (int i = 1; i < n; i++){
+            if (arr[i] > max)
+                max = arr[i];
+        }
+
+        return max;
+    }
+
+    public int[] radixSort(int[] arr, int n) {
+    
+        int max = getMax(arr, n);
+
+        for (int place = 1; max / place > 0; place *= 10)
+            countingSort(arr, n, place);
+      
+        return arr;  
+    }
+}
+
+Q-7 :- Product of array except self
+class Solution {
+    private int helper(int i,int[] nums,int[] ans,int asf){
+        if(i==nums.length) return 1;
+        int rightmulti=helper(i+1,nums,ans,asf*nums[i]);
+        ans[i]=asf*rightmulti;
+        return rightmulti*nums[i];
+    }
+    
+    public int[] productExceptSelf(int[] nums) {
+        int[] ans=new int[nums.length];
+        helper(0,nums,ans,1);
+        return ans;
+    }
+}
+
+Q-8 :- Make all array elements equal with minimum cost
+class Solution{
+  
+    public static int minCostToMakeElementEqual(int a[],int n)
+    {
+        Arrays.sort(a);
+        int target;
+
+        if (n % 2 == 1)
+            target = a[n / 2];
+
+        else
+            target = (a[n / 2] + a[(n - 2) / 2]) / 2;
+
+        int ans = 0;
+
+        for(int i = 0; i < n; i++)
+            ans += Math.abs(a[i] - target);
+
+        return ans;
+    }
+}
+
+Q-9 :- Find peak element
+class Solution {
+    public int findPeakElement(int[] nums) {
+        int low=0;
+        int mid=0;
+        int high=nums.length-1;
+        if(high<=0) return 0;
+        while(low<=high){
+            mid=low+(high-low)/2;
+            if(mid==0){
+                if(nums[0]>nums[1]) return 0;
+                else return 1;
+            }
+            else if(mid==nums.length-1){
+                if(nums[nums.length-1]>nums[nums.length-2]) return nums.length-1;
+                else  return nums.length-2;
+            }
+            else{
+                if(nums[mid]>nums[mid-1] && nums[mid]>nums[mid+1]){
+                    return mid;
+                }
+                else if(nums[mid]<nums[mid-1]) high=mid-1;
+                else low=mid+1;
+            }
+        }
+        return mid;
+    }
+}  
