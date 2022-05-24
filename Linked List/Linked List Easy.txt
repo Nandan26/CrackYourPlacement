@@ -1,0 +1,290 @@
+Q-1 :- Middle of the linked list
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+}
+
+Q-2 :- Linked List Cycle
+class Solution {
+    public boolean hasCycle(ListNode head) {
+        if(head==null || head.next==null) return false;
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while(fast != null && fast.next != null){
+            fast = fast.next.next;
+            slow = slow.next;
+            if(fast==slow)
+                return true;
+        }
+        return false;
+    }
+}
+
+Q-3 :- Convert Binary Number in a Linked List to Integer
+class Solution {
+    public int getDecimalValue(ListNode head) {
+        if(head==null) return 0;
+        if(head.next == null) return head.val;
+        int ans=0;
+        while(head!=null){
+            ans=ans*2 + head.val;
+            
+            head=head.next;
+        }
+        return ans;
+    }
+}
+
+Q-4 :- Remove duplicates from sorted list
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null) return null;
+        ListNode curr = head;  
+        while (curr.next != null) { 
+            if (curr.val == curr.next.val)
+                curr.next = curr.next.next; 
+            else 
+               curr = curr.next;
+        }
+        return head;
+    }
+}
+
+Q-5 :- Sort a linked list of 0s-1s-2s
+
+/*
+class Node
+{
+    int data;
+    Node next;
+    Node(int data)
+    {
+        this.data = data;
+        next = null;
+    }
+}
+*/
+class Soltion {
+
+    static Node segregate(Node head)
+    {
+        if(head==null || head.next==null)
+        {
+            return head;
+        }
+
+        Node zerotp = new Node(0);
+        Node onetp = new Node(0);
+        Node twotp = new Node(0);
+ 
+
+        Node zero = zerotp, one = onetp, two = twotp;
+
+        Node curr = head;
+        while (curr!=null)
+        {
+            if (curr.data == 0)
+            {
+                zero.next = curr;
+                zero = zero.next;
+                curr = curr.next;
+            }
+            else if (curr.data == 1)
+            {
+                one.next = curr;
+                one = one.next;
+                curr = curr.next;
+            }
+            else
+            {
+                two.next = curr;
+                two = two.next;
+                curr = curr.next;
+            }
+        }
+        if(onetp.next!=null){
+            zero.next=onetp.next;
+        }
+        else{
+            zero.next=twotp.next;
+        }
+        one.next = twotp.next;
+        two.next = null;
+
+        return zerotp.next;
+    }
+}
+
+Q-6 :- Remove Linked List elements
+class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+        
+        if(head==null) return head;
+        
+        ListNode temp =  head;
+        ListNode prev =  null;
+        
+        while(temp!=null ){
+            if(temp.val==val){
+                if(prev==null){                     
+                    temp =  temp.next;
+                    head =  temp;
+                }
+                else{
+                    prev.next =  temp.next;
+                    temp = temp.next; 
+                    
+                }
+            }
+            else{
+                    prev = temp;
+                    temp = temp.next;
+            }            
+        }
+        
+       return head;   
+    }
+}
+
+Q-7 :- Merge two sorted List
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) return l2;
+        if( l2== null) return l1;
+        
+        ListNode dummy=new ListNode(0);
+        ListNode prev= dummy;
+        
+        ListNode c1=l1;
+        ListNode c2=l2;
+        
+        while(c1 != null && c2!=null){
+            if(c1.val<c2.val){
+                prev.next=c1;
+                c1=c1.next;
+                
+            }
+            else{
+                prev.next=c2;
+                c2=c2.next;
+                
+            }
+            prev=prev.next;
+        }
+        if (c1==null) prev.next=c2;
+        else prev.next = c1;
+        
+        return dummy.next;
+        
+    }
+}
+
+Q-8 :- Multiply two numbers represented using LinkedList
+class Solution{
+    
+    static long multiplyTwoLists(Node first, Node second)
+    {
+        long N = 1000000007;
+        long a = 0, b = 0;
+ 
+        while (first != null || second !=  null){
+             
+            if(first != null){
+                a = ((a)*10)%N + first.data;
+                first = first.next;
+            }
+             
+            if(second != null)
+            {
+                b = ((b)*10)%N + second.data;
+                second = second.next;
+            }
+             
+        }
+        int ans=((a%N)*(b%N))%N;
+        return ans;
+    }
+}
+
+Q-9 :- Intersection of Two Linked Lists
+public class Solution {
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if(headA==null || headB==null) return null;
+        
+        ListNode a=headA;
+        ListNode b=headB;
+        
+        while(a!=b){
+            a=(a==null?headB:a.next);
+            b=(b==null?headA:b.next);
+        }
+        return a;
+    }
+}
+
+Q-10 :- Given only a pointer/reference to a node to be deleted in a singly linked list, how do you delete it?
+class Solution {
+ 
+    public void deleteNode(Node Node_ptr)
+    {
+        Node temp = Node_ptr.next;
+        Node_ptr.data = temp.data;
+        Node_ptr.next = temp.next;
+        temp = null;
+    }
+}
+
+Q-11 :- Palindrome Linked List
+class Solution {
+    ListNode node;
+    
+    public boolean isPalindrome(ListNode head) {
+        if(head == null) return true;   
+        if(node == null) node = head;
+        
+        boolean bool = isPalindrome(head.next);
+        
+        if(head.val == node.val)
+            node = node.next;
+        else
+            bool = false;
+        
+        return bool;
+    }
+}
+
+Q-12 :- Reverse Linked List
+class Solution {
+    ListNode oh=null;
+    ListNode ot=null;
+    private void addFirst(ListNode node){
+        if(oh==null){
+            oh=node;
+            ot=node;
+        }
+        else{
+            node.next=oh;
+            oh=node;
+        }
+    }
+    public ListNode reverseList(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode cur=head;
+        ListNode forw=null;
+        while(cur!=null){
+            forw=cur.next;
+            cur.next=null;
+            addFirst(cur);
+            cur=forw;
+        }
+        return oh;
+    }
+}

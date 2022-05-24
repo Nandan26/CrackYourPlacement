@@ -1,0 +1,476 @@
+Q-13 :- Add two numbers
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode dummy=new ListNode();
+        ListNode temp=dummy;
+        
+        int carry=0;
+        while(l1!=null || l2!=null || carry==1){
+            int add=0;
+            if(l1!=null){
+                add+=l1.val;
+                l1=l1.next;
+            }
+            if(l2!=null){
+                add+=l2.val;
+                l2=l2.next;
+            }
+            
+            add+=carry;
+            carry=add/10;
+            ListNode n=new ListNode(add%10);
+            temp.next=n;
+            temp=temp.next;
+            
+        }
+        
+        return dummy.next;
+    }
+}
+
+Q-14 :- Copy list with random pointers
+class Solution {
+    public Node copyRandomList(Node head) {
+        if(head==null)
+            return head;
+
+        Node temp = head;
+
+        while(temp!=null){
+            Node front = temp.next;
+            Node dummy = new Node(temp.val);
+            dummy.next =front;
+            temp.next = dummy;
+            temp = front;
+        }
+
+        temp = head;
+
+        while(temp!=null){
+            if(temp.random!=null)
+                temp.next.random = temp.random.next;
+            temp = temp.next.next;
+        }
+
+        temp = head;
+        Node newHead = temp.next;
+
+        while(temp!=null){
+            Node front = temp.next.next;
+            Node dummy = temp.next;
+
+            if(front!=null)
+              dummy.next = front.next;
+            temp.next = front;
+            temp = front;
+        }
+
+        return newHead;
+    }   
+}
+
+Q-15 :- Add two numbers ||
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode curr1 = l1;
+        ListNode curr2 = l2;
+        
+        // add in stack
+        Stack<ListNode> st1 = new Stack();
+        Stack<ListNode> st2 = new Stack();
+        while(curr1 != null || curr2 != null){
+            if(curr1 != null){
+                st1.push(curr1);
+                curr1 = curr1.next;
+            }
+            
+            if(curr2 != null){
+                st2.push(curr2);
+                curr2 = curr2.next;
+            }
+        }
+        
+        return addHelper(st1, st2);
+    }
+    
+    private ListNode  addHelper(Stack<ListNode> st1, Stack<ListNode> st2){
+        ListNode dummyNode = new ListNode();
+        ListNode head = dummyNode;
+        
+        int carry = 0;
+        while(!st1.empty() || !st2.empty()){
+            
+            int sum = carry;
+            
+            if(!st1.empty()){
+                sum += st1.pop().val;
+            }
+            
+            if(!st2.empty()){
+                sum += st2.pop().val;
+            }
+            
+            
+            ListNode newNode = new ListNode(sum % 10);
+            newNode.next = head.next;
+            head.next = newNode;
+            
+            carry = sum / 10;
+        }
+        
+        if(carry == 1){
+            ListNode newNode = new ListNode(1);
+            newNode.next = head.next;
+            head.next = newNode;
+        }
+        
+        return head.next;
+    }
+}
+
+Q-16 :- Reverse Linked List ||
+class Solution {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        if(head == null || head.next == null)return head;
+        ListNode bleft = null,leftp = null;
+        ListNode prev = null,curr = null,tmp = head;
+        int count = 1;
+        
+        while(tmp != null && count < left){
+            bleft = tmp;
+            tmp = tmp.next;
+            count++;
+        }
+       
+        leftp = tmp;
+        while(tmp != null && count <= right){
+            prev = curr;
+            curr = tmp;
+            tmp = tmp.next;
+            curr.next = prev;
+            count++;
+        }
+        
+        if(bleft == null){
+            head = curr;
+        }else{
+            bleft.next = curr;
+        }
+        
+        leftp.next = tmp;
+        return head;
+    }
+}
+
+Q-17 :- Reorder List
+class Solution {
+    
+    private ListNode temp;
+    private boolean endnode;
+
+    public void reorderList(ListNode head) {
+        temp = head;
+        endnode = false;
+        reorder(head);
+    }
+
+    private void reorder(ListNode node) {
+        if (node == null) return;
+        reorder(node.next);
+
+        if (!endnode) {
+            node.next=temp.next;
+            temp.next=node;
+            temp=node.next;
+        }
+
+        if (temp != null && temp.next == node) {
+            temp.next = null;
+            endnode = true;
+        }
+    }
+}
+
+Q-18 :- Remove Nth node from end of list
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode start=new ListNode(0);
+        start.next=head;
+        ListNode slow=start;
+        ListNode fast=start;
+        for(int i=1;i<=n;i++){
+            fast=fast.next;
+        }
+        while(fast.next!=null){
+            slow=slow.next;
+            fast=fast.next;
+        }
+        slow.next=slow.next.next;
+        
+        return start.next;
+    }
+}
+
+Q-19 :- Flatten a multilevel doubly linkeddlist
+class Solution {
+    
+    public Node flatten(Node head) {
+		if(head == null){
+            return null;
+        }
+        Node cur = head;
+        Node next;
+        Node temp;
+        while(cur != null){
+            if(cur.child != null){
+                next = cur.next;
+                temp = flatten(cur.child);
+                cur.next = temp;
+                temp.prev = cur;
+                cur.child = null;
+                if(next != null){
+                    while(temp.next != null){
+                        temp = temp.next;
+                    }
+                    temp.next = next;
+                    next.prev = temp;
+                }
+                cur = next;
+            }
+            
+            else{
+                cur = cur.next;
+            }
+        }
+        return head;
+    }
+}
+
+Q-20 :- Patition List
+class Solution {
+    public ListNode partition(ListNode head, int x) {
+        if(head==null) return null;
+        
+      
+        ListNode less=new ListNode(0);
+        ListNode greater=new ListNode(0);
+        
+        ListNode tp1=less;
+        ListNode tp2=greater;
+      
+        ListNode tmp=head;
+        while(tmp!=null){
+            if(tmp.val<x){
+                tp1.next=tmp;
+                tp1=tp1.next;
+            }else{
+                tp2.next=tmp;
+                tp2=tp2.next;
+            }
+           tmp=tmp.next;
+        }
+        tp1.next=greater.next;
+        tp2.next=null;
+
+        return less.next;
+    }
+}
+
+Q-21 :- Remove Duplicates from Sorted List II
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        
+        if(head == null || head.next == null){
+            return head;
+        }
+           
+        ListNode temp = head;
+        
+        ListNode prev = null;
+        
+        ListNode head2 = null;
+
+        int cnt = 1;
+        
+     
+        while(temp != null){
+
+            while(temp.next != null && temp.val == temp.next.val){
+                temp = temp.next;
+                cnt++;
+            }
+    
+            if(cnt == 1){
+
+                if(head2 == null){
+
+                    head2 = temp;
+                    prev = head2;
+                }
+
+                else{
+                    prev.next = temp;
+                    prev = prev.next;
+                }
+            }
+            else{
+                cnt = 1;
+            }
+ 
+            temp = temp.next;
+        }
+
+        if(prev != null){
+            if(cnt==1) prev.next=null;
+            else prev.next=temp;
+        }
+            
+        return head2;
+    }
+}
+
+Q-22 :- Rearrange a Linked List in Zig-Zag fashion
+class Solution {
+
+    public Node zigZagList(Node head)
+    {
+
+        boolean flag = true;
+ 
+        Node curr = head;
+        Node temp=new Node(0);
+        while (curr != null && curr.next != null) {
+            if (flag == true) {
+                
+                if (curr.data > curr.next.data) {
+                    temp = curr.data;
+                    curr.data = curr.next.data;
+                    curr.next.data = temp;
+                }
+            }
+            else
+            {
+
+                if (curr.data < curr.next.data) {
+                    temp = curr.data;
+                    curr.data = curr.next.data;
+                    curr.next.data = temp;
+                }
+            }
+ 
+            curr = curr.next;
+
+            flag = !(flag);
+        }
+        return head;   
+    }
+}
+
+Q-23 :- Sort List
+class Solution {
+    private static ListNode mid(ListNode head){
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while(fast.next != null && fast.next.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        return slow;
+    }
+    private static ListNode Merge(ListNode l1, ListNode l2){
+        if(l1 == null)
+            return l2;
+        
+        if(l2 == null)
+            return l1;
+        
+        ListNode dummy = new ListNode(-1);
+        ListNode curr = dummy;
+        
+        while(l1 != null && l2 != null){
+            if(l1.val <= l2.val){
+                curr.next = l1;
+                l1 = l1.next;
+                curr = curr.next;
+            }
+            else{
+                curr.next = l2;
+                l2 = l2.next;
+                curr = curr.next;
+            }
+        }
+        
+        if(l1 != null)
+            curr.next = l1;
+        
+        if(l2 != null)
+            curr.next = l2;
+        
+        return dummy.next;
+    }
+    public ListNode sortList(ListNode head) {
+        if(head == null || head.next == null)
+            return head;
+        
+        ListNode mid = mid(head);
+        ListNode nextmid = mid.next;
+        mid.next = null;
+        
+        ListNode left = sortList(head);
+        ListNode right = sortList(nextmid);
+        
+        ListNode sorted = Merge(left, right);
+        
+        return sorted;
+    }
+}
+
+Q-24 :- Segregate Odd Even Linked List
+class Solution{
+    public ListNode oddEvenList(ListNode head) {
+        if(head!=null){
+            ListNode odd = head;
+            ListNode even = head.next;
+            ListNode evenhead = even;
+
+            while(odd.next!=null && even.next!=null){
+                odd.next = even.next;
+                odd = odd.next;
+                even.next = odd.next;
+                even = even.next;
+            }
+            odd.next = evenhead;
+        }
+        return head;
+    }
+}
+
+Q-25 :- Rearrange a given linked list in-place
+class gfg {
+
+    Node reorderlist(Node head){
+        temp = head;
+        endnode = false;
+        reorder(head);
+    }
+    private Node temp;
+    private boolean endnode;
+
+    private void reorder(Node node) {
+        if (node == null) return;
+        reorder(node.next);
+
+        if (!endnode) {
+            node.next=temp.next;
+            temp.next=node;
+            temp=node.next;
+        }
+
+        if (temp != null && temp.next == node) {
+            temp.next = null;
+            endnode = true;
+        }
+    }
+}

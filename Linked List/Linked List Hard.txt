@@ -1,0 +1,302 @@
+Q-26 :- Merge K Sorted Lists
+class Solution {
+    private static ListNode merge(ListNode l1,ListNode l2){
+        if(l1==null || l2==null) return l1!=null ? l1:l2;
+        
+        ListNode dummy=new ListNode(-1);
+        ListNode prev=dummy;
+        ListNode c1=l1,c2=l2;
+        
+        while(c1!=null && c2!=null){
+            if(c1.val<c2.val){
+                prev.next=c1;
+                c1=c1.next;
+            }
+            else{
+                prev.next=c2;
+                c2=c2.next;
+            }
+            prev=prev.next;
+        }
+        prev.next=c1!=null?c1:c2;
+        
+        return dummy.next;
+    }
+    private static ListNode mergeK(ListNode[] lists,int si,int ei){
+        if(si>ei) return null;
+        if(si==ei) return lists[si];
+        int mid= (si+ei)/2;
+        ListNode L1=mergeK(lists,si,mid);
+        
+        ListNode L2=mergeK(lists,mid+1,ei);
+        
+        return merge(L1,L2);
+    }
+    
+    public ListNode mergeKLists(ListNode[] lists) {
+        if(lists.length==0) return null;
+        
+        return mergeK(lists,0,lists.length-1);
+    }
+}
+
+Q-27 :- Reverse Nodes in k-group
+class Solution {
+    ListNode oh=null,tt=null,th=null,ot=null;
+    private void addFirst(ListNode node){
+        if(th==null){
+            th=node;
+            tt=node;
+        }
+        else{
+            node.next=th;
+            th=node;
+        }
+    }
+    private int length(ListNode head){
+        ListNode cur=head;
+        int len=0;
+        while(cur!=null){
+            cur=cur.next;
+            len++;
+        }
+        return len;
+    }
+    public ListNode reverseKGroup(ListNode head,int k) {
+        if(head==null || head.next==null){
+            return head;
+        }
+        int len=length(head);
+        
+        ListNode cr=head;
+        ListNode fr=null;
+
+        while(len>=k){
+            int temp=k;
+            
+            while(temp-->0){
+                fr=cr.next;
+                cr.next=null;
+                
+                addFirst(cr);
+                
+                cr=fr; 
+            }
+                
+            if(oh==null){
+                oh=th;
+                ot=tt;
+            }
+            else{
+                ot.next=th;
+                ot=tt;
+            }
+                
+            th=null;
+            tt=null;
+            len-=k;
+        }
+        ot.next=cr;
+        return oh;
+        
+    }
+}
+
+Q-28 :- Merge Sort for LinkedList
+class Solution {
+    private static ListNode mid(ListNode head){
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while(fast.next != null && fast.next.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        return slow;
+    }
+    private static ListNode Merge(ListNode l1, ListNode l2){
+        if(l1 == null)
+            return l2;
+        
+        if(l2 == null)
+            return l1;
+        
+        ListNode dummy = new ListNode(-1);
+        ListNode curr = dummy;
+        
+        while(l1 != null && l2 != null){
+            if(l1.val <= l2.val){
+                curr.next = l1;
+                l1 = l1.next;
+                curr = curr.next;
+            }
+            else{
+                curr.next = l2;
+                l2 = l2.next;
+                curr = curr.next;
+            }
+        }
+        
+        if(l1 != null)
+            curr.next = l1;
+        
+        if(l2 != null)
+            curr.next = l2;
+        
+        return dummy.next;
+    }
+    public ListNode sortList(ListNode head) {
+        if(head == null || head.next == null)
+            return head;
+        
+        ListNode mid = mid(head);
+        ListNode nextmid = mid.next;
+        mid.next = null;
+        
+        ListNode left = sortList(head);
+        ListNode right = sortList(nextmid);
+        
+        ListNode sorted = Merge(left, right);
+        
+        return sorted;
+    }
+}
+
+Q-29 :- Flattening a LinkedList
+class Solution
+{
+    private Node merge(Node a, Node b) {
+        
+        Node temp = new Node(0);
+        Node res = temp; 
+        
+        while(a != null && b != null) {
+            if(a.data < b.data) {
+                temp.bottom = a; 
+                temp = temp.bottom; 
+                a = a.bottom; 
+            }
+            else {
+                temp.bottom = b;
+                temp = temp.bottom; 
+                b = b.bottom; 
+            }
+        }
+        
+        if(a != null) temp.bottom = a; 
+        else temp.bottom = b;
+        return res.bottom; 
+    
+    }
+    Node flatten(Node root)
+    {
+       
+            if (root == null || root.next == null) 
+                return root; 
+      
+            root.next = flatten(root.next); 
+      
+            root = merge(root, root.next); 
+      
+
+            return root; 
+    }
+}
+
+Q-30 :- Subtract Two Numbers represented as Linked Lists
+class Solution {
+    private static int borr;
+    public static Node subtractLinkedList(Node head1, Node head2)
+    {
+        
+        if (head1 == null && head2 == null)
+            return null;
+ 
+        int len1 = getLength(head1);
+        int len2 = getLength(head2);
+ 
+        Node n1 = null, n2 = null;
+ 
+        Node tp1 = head1;
+        Node tp2 = head2;
+ 
+        if (len1 != len2) {
+            n1 = len1 > len2 ? n1 : n2;
+            n2 = len1 > len2 ? n2 : n1;
+            n2 = addZeros(n2, Math.abs(len1 - len2));
+        }
+ 
+        else {
+
+            while (head1 != null && head2 != null) {
+                if (head1.data != head2.data) {
+                    n1 = head1.data > head2.data ? tp1 : tp2;
+                    n2 = head1.data > head2.data ? tp2 : tp1;
+                    break;
+                }
+                head1 = head1.next;
+                head2 = head2.next;
+            }
+        }
+ 
+        borrow = false;
+        return helper(n1, n2);
+    }
+    
+    private Node helper(Node head1, Node head2)
+    {
+        if (head1 == null && head2 == null && borr == false)
+            return null;
+ 
+        Node prev= helper((head1 != null) ? head1.next : null,(head2 != null) ? head2.next : null);
+ 
+        int k1 = l1.data;
+        int k2 = l2.data;
+        int sub = 0;
+
+        if (borr) {
+            k1--;
+            borr = false;
+        }
+ 
+        if (k1 < k2) {
+            borr = true;
+            k1 = k1 + 10;
+        }
+
+        sub = k1 - k2;
+
+        Node curr = new Node(sub);
+ 
+        curr.next = prev;
+ 
+        return curr;
+    }
+    private int getLength(Node head)
+    {
+        int len = 0;
+        while (head != null) {
+            head = head.next;
+            len++;
+        }
+        return len;
+    }
+    
+    
+    private Node addZeros(Node tmp, int diff)
+    {
+        if (tmp == null)
+            return null;
+ 
+        Node h = new Node(0);
+        diff--;
+        Node tp = h;
+        while ((diff--) != 0) {
+            tp.next = new Node(0);
+            tp = tp.next;
+        }
+        tp.next = tmp;
+        return h;
+    }
+}
