@@ -1,0 +1,315 @@
+Q-1 :- Diameter of Binary Tree
+class Solution {
+    static int height(TreeNode node)
+    {
+       
+        if (node == null)
+            return 0;
+ 
+
+        return (1+ Math.max(height(node.left),height(node.right)));
+    }
+    public int diameterOfBinaryTree(TreeNode root) {
+        if(root == null){
+            return 0;
+        }
+        int lh=height(root.left);
+        int rh=height(root.right);
+        
+        int l=diameterOfBinaryTree(root.left);
+        int r=diameterOfBinaryTree(root.right);
+        
+        return Math.max(lh+rh,Math.max(l,r));
+        
+        
+    }
+}
+
+Q-2 :- Invert Binary Tree
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if(root==null){
+            return null;
+        }
+        TreeNode left=invertTree(root.right);
+        TreeNode right=invertTree(root.left);
+        
+        TreeNode nroot=new TreeNode(root.val);
+        nroot.left=left;
+        nroot.right=right;
+        return nroot;
+        
+    }
+}
+
+Q-3 :- Subtree of Another Tree
+class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if(root==null) return false;
+        if (helper(root, subRoot)) return true;
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+
+    public boolean helper(TreeNode root, TreeNode subRoot) {
+        if (root == null && subRoot == null) return true;
+        if (root == null || subRoot == null) return false;
+        if (root.val != subRoot.val) return false;
+        return helper(root.left, subRoot.left) && helper(root.right, subRoot.right);
+    }
+}
+
+Q-4:- Range Sum of BST
+class Solution {
+    public int rangeSumBST(TreeNode root, int low, int high) {
+        if(root==null) return 0;
+        int ans=0;
+        if(root.val<low) ans=rangeSumBST(root.right,low,high);
+        
+        else if(root.val>high) ans=rangeSumBST(root.left,low,high);
+        
+        else ans=root.val+rangeSumBST(root.right,low,high)+rangeSumBST(root.left,low,high);
+        
+        return ans;
+    }
+}
+
+Q-5 :- Symmetric Tree
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        return root==null || isSymmetricHelp(root.left, root.right);
+    }
+
+    private boolean isSymmetricHelp(TreeNode left, TreeNode right){
+        if(left==null || right==null)
+            return left==right;
+
+        return (left.val==right.val) && isSymmetricHelp(left.left, right.right) && isSymmetricHelp(left.right, right.left);
+    }
+}
+
+Q-6 :- Convert Sorted Array to BST
+class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if(nums.length==0) return null;
+        return helper(nums,0,nums.length-1);
+    }
+    private TreeNode helper(int[] nums,int low,int high){
+        if(low>high) return null;
+        
+        int mid=low+(high-low)/2;
+        
+        TreeNode root=new TreeNode(nums[mid]);
+        root.left=helper(nums,low,mid-1);
+        root.right=helper(nums,mid+1,high);
+        
+        return root;
+    }
+}
+
+Q-7 :- Merge two Binary trees
+class Solution {
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if(root1==null && root2==null) return null;
+
+        if(root1==null){
+            return root2;
+        }
+        if(root2==null){
+            return root1;
+        }        
+        return  new TreeNode(root1.val + root2.val, mergeTrees(root1.left, root2.left), mergeTrees(root1.right, root2.right));
+    }
+}
+
+Q-8 :- Maximum Depth of Binary Tree
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if(root==null) return 0;
+        int left=maxDepth(root.left);
+        int right=maxDepth(root.right);
+        
+        return (left>right)?left+1:right+1;
+    }
+}
+
+Q-9 :- Binary Tree Paths
+class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ans = new ArrayList<String>();
+        if (root != null) helper(root, "", ans);
+        return ans;
+    }
+    private void helper(TreeNode root, String path, List<String> ans) {
+        if (root.left == null && root.right == null) ans.add(path + root.val);
+        if (root.left != null) helper(root.left, path + root.val + "->", ans);
+        if (root.right != null) helper(root.right, path + root.val + "->", ans);
+    }
+}
+
+Q-10 :- Same Tree
+class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        
+        if (p == null && q == null) return true;
+        if (p == null && q != null || p != null && q == null) return false;
+        return (p.val==q.val) && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}
+
+Q-11 :- Lowest Common Ancestor of a BST
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root==null) return null;
+        if(p.val< root.val && q.val<root.val){
+            return lowestCommonAncestor(root.left,p,q);
+        }
+        else if(p.val> root.val && q.val>root.val){
+            return lowestCommonAncestor(root.right,p,q);
+        }
+        else return root;
+    }
+}
+
+Q-12 :- Path Sum
+class Solution {
+    public boolean hasPathSum(TreeNode root, int sum) {    
+      if (root == null)
+         return false;
+
+      if (root.left == null && root.right == null && root.val == sum)
+         return true;
+
+      return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+    }
+}
+
+Q-13 :- Minimum Absolute Difference in BST
+class Solution {
+    private TreeNode last = null;
+    private int ans = Integer.MAX_VALUE;
+    
+    public int getMinimumDifference(TreeNode root) {
+        helper(root);    
+        return ans;
+    }
+    
+    private void helper(TreeNode root) {
+        if (root == null) return;
+        
+        helper(root.left);
+        if (last != null) {
+            ans = Integer.min(ans, Math.abs(last.val - root.val));
+        }
+        last = root;
+        helper(root.right);
+    }
+}
+
+Q-14 :- Sum of Left leaves
+class Solution {
+    public int sumOfLeftLeaves(TreeNode root) {
+        return leftleavessum(root, false); 
+    }
+    
+    private int leftleavessum(TreeNode root, boolean leftside){
+        if(root==null) return 0;
+        if(root.left == null && root.right == null){
+            return leftside?root.val:0;
+        }
+        
+        int ans = 0;
+        
+        ans += leftleavessum(root.left, true);
+        ans += leftleavessum(root.right, false);
+        
+        return ans;
+    }
+}
+
+Q-15:- Balanced Binary Tree
+class Solution {
+    private int solve(TreeNode root){
+        if(root==null) return 0;
+        int lefth=solve(root.left);
+        if(lefth==-1) return -1;
+        
+        int righth=solve(root.right);
+        if(righth==-1) return -1;
+        
+        if(Math.abs(lefth-righth)>1)return -1;
+        return Math.max(lefth,righth)+1;
+    }
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+        
+        int ans=solve(root);
+        
+        if(ans==-1) return false;
+        return true;
+    }
+}
+
+Q-16 :- Predecessor and Successor
+class Solution {
+    
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        
+        TreeNode successor = null;
+        
+        while (root != null) {
+            
+            if (p.val >= root.val) {
+                root = root.right;
+            } else {
+                successor = root;
+                root = root.left;
+            }
+        }
+        
+        return successor;
+    }
+    public TreeNode inorderPredecessor(TreeNode root, TreeNode p) {
+
+        TreeNode predecessor = NULL;
+        while(root!=NULL){
+            if(root.val >= p.val){
+                root = root.left;
+            }
+
+            else{
+                predecessor = root;
+                root = root.right;
+            }
+        }
+        return predecessor;
+    }
+}
+
+Q-17 :- Binary Tree inorder Traversal
+class Solution {
+    public void inorder(TreeNode root, List<Integer> nums) {
+          if (root == null) return;
+          inorder(root.left, nums);
+          nums.add(root.val);
+          inorder(root.right, nums);
+    }
+}
+
+Q-18 :- Check whether BST contains Dead End
+class GFG {
+    public static boolean isDeadEnd(Node root)
+    {
+        return helper(root,1,Integer.MAX_VALUE);
+        
+    }
+    private static boolean helper(Node root,int min,int max)
+    {
+        if (root==null)
+            return false;
+
+        if (min == max)
+            return true;
+
+        return (helper(root.left, min, root.data - 1) || helper(root.right, root.data + 1, max));
+    }
+} 

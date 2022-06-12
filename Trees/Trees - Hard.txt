@@ -1,0 +1,409 @@
+Q-39 :- Binary Tree to DLL
+class Solution
+{
+    //Function to convert binary tree to doubly linked list and return it.
+    Node head=null;
+    Node last=null;
+    Node bToDLL(Node root)
+    {
+	//  Your code here
+	    if(root!=null)
+	    {   
+	        bToDLL(root.left);
+            if(head==null)
+            {
+                Node temp=new Node(root.data);
+                head=temp;
+                last=temp;
+            }
+            else
+            {
+                Node temp=new Node(root.data);
+                last.right=temp;
+                temp.left=last;
+                last=temp;
+            }
+        
+            bToDLL(root.right);
+        
+        }
+        return head;
+   }
+}
+
+Q-40 :- Binary Tree Maximum Path Sum
+class Solution {
+ 
+    public int maxPathSum(TreeNode root) {
+        AtomicInteger h=new AtomicInteger(Integer.MIN_VALUE);
+        return mp(root,h);
+    }
+    int mp(TreeNode root,AtomicInteger h){
+        if(root==null){
+            return Integer.MIN_VALUE;
+        }
+        AtomicInteger h1=new AtomicInteger(Integer.MIN_VALUE);
+        AtomicInteger h2=new AtomicInteger(Integer.MIN_VALUE);
+        int l=mp(root.left,h1);
+        int r=mp(root.right,h2);
+        h.set(Math.max(Math.max(h1.get(),h2.get()),0)+root.val);
+        
+        return Math.max(Math.max(l,r),Math.max(h1.get(),0)+Math.max(h2.get(),0)+root.val);
+        
+    }
+}
+
+Q-41 :- Sum of Distances in Tree
+class Solution {
+       public int[] sumOfDistancesInTree(int n, int[][] edges) {
+
+        final ArrayList<Integer>[] graph = new ArrayList[n];
+        final int[] count = new int[n];
+        Arrays.fill(count, 1);
+        final int[] answer = new int[n];
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        for (int[] edge : edges) {
+            graph[edge[0]].add(edge[1]);
+            graph[edge[1]].add(edge[0]);
+        }
+
+        postOrder(0, -1, graph, count, answer);
+
+        preOrder(0, -1, graph, count, answer, n);
+
+        return answer;
+    }
+
+    private void postOrder(int node, int parent, ArrayList<Integer>[] graph, int[] count, int[] answer) {
+        for (int child : graph[node]) {
+            if (child != parent) {
+                postOrder(child, node, graph, count, answer);
+                count[node] += count[child];
+                answer[node] += answer[child] + count[child];
+            }
+        }
+    }
+
+    private void preOrder(int node, int parent, ArrayList<Integer>[] graph, int[] count, int[] answer, int n) {
+        for (int child : graph[node]) {
+            if (child != parent) {
+                answer[child] = answer[node] + (n - count[child]) - count[child];
+                preOrder(child, node, graph, count, answer, n);
+            }
+        }
+    }
+}
+
+Q-42 :- Binary Tree Cameras
+class Solution {
+    public static int minCameraCover(TreeNode root) {
+        if (MinCamerasInBT_(root) == -1)
+            camera++;
+        return camera;
+    }
+    static int camera = 0;
+
+    private static int MinCamerasInBT_(TreeNode root) {
+        if (root == null) {
+            return 1;
+        }
+
+        int lres = MinCamerasInBT_(root.left);
+        int rres = MinCamerasInBT_(root.right);
+
+        if (lres == -1 || rres == -1) {
+            camera++;
+            return 0;
+        }
+
+        if (lres == 0 || rres == 0) {
+            return 1;
+        }
+
+        return -1;
+    }
+
+}   
+
+Q-43 :- Vertical Order Traversal in Binary Tree
+
+class Solution {
+    private static class Pair {
+        TreeNode node = null;
+        int hl = 0;
+
+        Pair(TreeNode node, int hl) {
+            this.node = node;
+            this.hl = hl;
+        }
+    }
+
+    public static List<List<Integer>> verticalTraversal(TreeNode root) {
+        LinkedList<Pair> que = new LinkedList<>();
+        que.addLast(new Pair(root, 0));
+        HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
+
+        int minHL = 0;
+        int maxHL = 0;
+
+        while (que.size() != 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                Pair rp = que.removeFirst();
+
+                map.putIfAbsent(rp.hl, new ArrayList<>());
+
+                map.get(rp.hl).add(rp.node.val);
+
+                minHL = Math.min(minHL, rp.hl);
+                maxHL = Math.max(maxHL, rp.hl);
+
+                if (rp.node.left != null)
+                    que.addLast(new Pair(rp.node.left, rp.hl - 1));
+
+                if (rp.node.right != null)
+                    que.addLast(new Pair(rp.node.right, rp.hl + 1));
+            }
+        }
+
+        List<List<Integer>> ans = new ArrayList<>();
+        while (minHL <= maxHL) {
+            ans.add(map.get(minHL));
+            minHL++;
+        }
+
+        return ans;
+    }
+}
+     
+
+
+Q-44 :- Print all K-Sum Paths in a Binary Tree
+class Solution {
+    private static ArrayList<Integer> path = new ArrayList<Integer>();
+
+    void printKPathHelper(Node root, int k)
+    {
+        if (root == null)
+            return;
+ 
+        path.add(root.data);
+ 
+        printKPathHelper(root.left, k);
+ 
+        printKPathHelper(root.right, k);
+ 
+
+        int f = 0;
+        for (int j = path.size() - 1; j >= 0; j--) {
+            f += path.get(j);
+ 
+            if (f == k)
+                printVector(path, j);
+        }
+        path.remove(path.size() - 1);
+    }
+
+    private void printKPath(Node root, int k)
+    {
+        path = new ArrayList<Integer>();
+        printKPathHelper(root, k);
+    }
+    private void printVector(Vector<Integer> v, int i)
+    {
+        for (int j = i; j < v.size(); j++)
+            System.out.print(v.get(j) + " ");
+        System.out.println();
+    }
+}
+
+Q-45 :- Serialize and Deserialize Binary Tree
+class Codec {
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        StringBuilder sb=new StringBuilder();
+        return buildserial(sb, root).toString();
+    }
+    
+    // Generate preorder string
+    private StringBuilder buildserial(StringBuilder sb, TreeNode root) {
+        if (root == null) return sb.append("#");
+        sb.append(root.val).append(",");
+        buildserial(sb, root.left).append(",");
+        buildserial(sb, root.right);
+        return sb;
+    }
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        Deque<String> queue = new LinkedList<>();
+        queue.addAll(Arrays.asList(data.split(",")));
+        return builddeserial(queue);
+    }
+    
+    private TreeNode builddeserial(Deque<String> q) {
+        String val = q.poll();
+        if ("#".equals(val)) return null;
+        TreeNode root = new TreeNode(Integer.valueOf(val));
+        root.left = builddeserial(q);
+        root.right = builddeserial(q);
+        return root;
+
+    }
+}
+
+Q-46 :- Find Median BST
+class Solution {
+
+    int counNodes(Node root)
+    {
+        Node cur, prev;
+
+        int count = 0;
+
+        if (root == null)
+            return count;
+
+        Node cur = root;
+        while (cur != null) {
+            if (cur.left == null) {
+                count++;
+                cur = cur.right;
+            } else {
+                Node prev = cur.left;
+                while (prev.right != null && prev.right != cur) {
+                    prev = prev.right;
+                }
+
+                if (prev.right == null) {
+                    prev.right = cur;
+                    count++;
+                    cur = cur.left;
+                } else {
+                    prev.right = null;
+                    cur = cur.right;
+                }
+            }
+        }
+        return count;
+    }
+
+    static int findMedian(Node root)
+    {
+    if (root == null)
+            return 0;
+
+        int count = counNodes(root);
+        int currCount = 0;
+        Node current = root, pre = null, prev = null;
+
+        while (current != null)
+        {
+            if (current.left == null)
+            {
+                currCount++;
+
+                if (count % 2 != 0 && currCount == (count+1)/2)
+                    return prev.data;
+
+                else if (count % 2 == 0 && currCount == (count/2)+1)
+                    return (prev.data + current.data)/2;
+
+                prev = current;
+
+                current = current.right;
+            }
+            else
+            {
+                pre = current.left;
+                while (pre.right != null && pre.right != current)
+                    pre = pre.right;
+                
+                if (pre.right == null)
+                {
+                    pre.right = current;
+                    current = current.left;
+                }
+
+                else
+                {
+                    pre.right = null;
+
+                    prev = pre;
+
+                    currCount++;
+
+                    if (count % 2 != 0 && currCount == (count+1)/2 )
+                        return current.data;
+
+                    else if (count%2==0 && currCount == (count/2)+1)
+                        return (prev.data+current.data)/2;
+
+                  
+                    prev = current;
+                    current = current.right;
+
+                }
+            }
+        } 
+        return -1;
+    }
+}
+
+Q-47 :- Largest BST in BT
+
+class Solution {
+   class NodeValue {
+        public int maxNode, minNode, maxSize;
+    
+        NodeValue(int minNode, int maxNode, int maxSize) {
+            this.maxNode = maxNode;
+            this.minNode = minNode;
+            this.maxSize = maxSize;
+    	}
+   } 
+    
+   private NodeValue largestBSTSubtreeHelper(TreeNode root) {
+
+        if (root == null) {
+            return new NodeValue(Integer.MAX_VALUE, Integer.MIN_VALUE, 0);
+        }
+
+        NodeValue left = largestBSTSubtreeHelper(root.left);
+        NodeValue right = largestBSTSubtreeHelper(root.right);
+        if (left.maxNode < root.val && root.val < right.minNode) {
+            // It is a BST.
+            return new NodeValue(Math.min(root.val, left.minNode), Math.max(root.val, right.maxNode), 
+                                left.maxSize + right.maxSize + 1);
+        }
+
+        return new NodeValue(Integer.MIN_VALUE, Integer.MAX_VALUE, 
+                            Math.max(left.maxSize, right.maxSize));
+    }
+    
+    public int largestBSTSubtree(TreeNode root) {
+        return largestBSTSubtreeHelper(root).maxSize;
+    }
+}
+
+Q-48 :- Construct BST from given preOrder Traversal
+class Solution {
+    int idx = 0;
+    public TreeNode bstFromPreorder(int[] preorder) {
+        
+        int lr=0;
+        int rr=1001;
+        return bstFromPreorder(preorder, lr,rr);
+    }
+
+    public TreeNode bstFromPreorder(int[] pre, int lr,int rr) {
+        if (idx >= pre.length || pre[idx] < lr ||  pre[idx] > rr) return null;
+        TreeNode root = new TreeNode(pre[idx++]);
+        root.left = bstFromPreorder(pre,lr ,root.val);
+        root.right = bstFromPreorder(pre,root.val ,rr);
+        
+        return root;
+    }
+}
