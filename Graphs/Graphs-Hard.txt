@@ -1,0 +1,501 @@
+Q-28 :- Longest Increasing Path in Matrix
+class Solution {
+    int[][] inc;
+    int[][] dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+    public int longestIncreasingPath(int[][] matrix) {
+        inc = new int[matrix.length][matrix[0].length];
+        int path = 0;
+        for(int i=0;i<matrix.length;i++) {
+            for(int j=0;j<matrix[0].length;j++) 
+                path = Math.max(path, dfs(i, j, matrix));
+        }
+        
+        return path;
+    }
+     
+    private int dfs(int x, int y, int[][] matrix) {
+        if (inc[x][y] != 0) return inc[x][y];
+        for(int d=0;d<dirs.length;d++) {
+            int i = dirs[d][0] + x, j = dirs[d][1] + y;
+            if(i >= 0 && i < matrix.length && j >= 0 && j < matrix[0].length && matrix[x][y] < matrix[i][j]) {
+                inc[x][y] = Math.max(inc[x][y], dfs(i, j, matrix));
+            }
+        }
+        return ++inc[x][y];
+    }
+}
+
+Q-29 :- Making a Large Island
+class Solution {
+    public int largestIsland(int[][] grid) {
+        Map<Integer, Integer> areamap = new HashMap<>();
+        areamap.put(0,0);
+        int n = grid.length;
+        int index = 2;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]==1){
+                    int area = FindArea(grid, i, j, index);
+                    areamap.put(index, area);
+                    index++;
+                }
+            }
+        }
+        
+        int max = areamap.getOrDefault(2,0);
+        for(int r=0;r<n;r++){
+            for(int c=0;c<n;c++){
+                if(grid[r][c]==0){
+                    Set<Integer> neighbors = new HashSet<>();
+                    neighbors.add(r>0?grid[r-1][c]:0);
+                    neighbors.add(c>0?grid[r][c-1]:0);
+                    neighbors.add(r<n-1?grid[r+1][c]:0);
+                    neighbors.add(c<n-1?grid[r][c+1]:0);
+                    int ans = 1;
+                    for(int neighbor: neighbors){
+                        ans+=areamap.get(neighbor);
+                    }
+                    if(ans>max){
+                        max = ans;
+                    }
+                }
+            }
+        }
+        
+        return max;
+    }
+    
+    public int FindArea(int[][] grid, int r, int c, int index) {
+        int n = grid.length;
+        if(r<0||r>=n||c<0||c>=n||grid[r][c]!=1){
+            return 0;
+        }
+        
+        grid[r][c] = index;
+        
+        int area = 1;
+        area+=FindArea(grid, r, c+1, index);
+        area+=FindArea(grid, r+1, c, index);
+        area+=FindArea(grid, r, c-1, index);
+        area+=FindArea(grid, r-1, c, index);
+        
+        return area;
+    }
+}
+
+Q-30 :- Remove Boxes
+class Solution {
+    private int[] boxes;
+    private int[][][] dp;
+
+    public int removeBoxes(int[] boxes) {
+        this.boxes = boxes;
+        this.dp = new int[boxes.length][boxes.length][boxes.length];
+        return helper(0, boxes.length - 1, 0);
+    }
+
+    private int helper(int left, int right, int k) {
+        if (left > right) {
+            return 0;
+        }
+        if (dp[left][right][k] != 0) {
+            return dp[left][right][k];
+        }
+        while (left < right && boxes[left + 1] == boxes[left]) {
+            left++;
+            k++;
+        }
+        int result = (k + 1) * (k + 1) + helper(left + 1, right, 0);
+        for (int i = left + 1; i <= right; i++) {
+            if (boxes[left] == boxes[i]) {
+                result = Math.max(result, helper(left + 1, i - 1, 0) + helper(i, right, k + 1));
+            }
+        }
+
+        dp[left][right][k] = result;
+        return result;
+    }
+}
+
+Q-31 :- Critical Connections in a Network
+class Solution 
+{
+    public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) 
+    {
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        List<List<Integer>> ans = new LinkedList<>();
+        for (List<Integer> connection : connections)
+        {
+            int a = connection.get(0);
+            int b = connection.get(1);
+            graph.putIfAbsent(a, new LinkedList<>());
+            graph.putIfAbsent(b, new LinkedList<>());
+            graph.get(a).add(b);
+            graph.get(b).add(a);
+        }
+        int[] rank = new int[n];
+        for (int i = 0; i < n; ++i)
+        {
+            rank[i] = i;
+        }
+        boolean[] visited = new boolean[n];
+        int prevNode = -1, curNode = 0, curRank = 0;
+        helper(visited, rank, prevNode, curNode, curRank, graph, ans);
+        return ans;
+    }
+    
+    private void helper(boolean[] visited, int[] rank, int prevNode, int curNode, int curRank, Map<Integer, List<Integer>> graph, List<List<Integer>> ans)
+    {
+        rank[curNode] = curRank;
+        visited[curNode] = true;
+        for (int neighbor : graph.get(curNode))
+        {
+            if (neighbor == prevNode)
+                continue;
+            if (!visited[neighbor])
+                helper(visited, rank, curNode, neighbor, curRank + 1,graph,ans);
+            rank[curNode] = Math.min(rank[curNode], rank[neighbor]);
+            if (rank[neighbor] == curRank + 1){
+                ans.add(Arrays.asList(curNode, neighbor));
+            }
+        }
+    }
+}
+
+Q-32 :- Alien Dictionary
+class Solution {
+    public static String alienOrder(String[] words) {
+        Map<Character, Set<Character>> map = new HashMap<Character, Set<Character>>();
+        Map<Character, Integer> degree = new HashMap<Character, Integer>();
+        String result = "";
+        if (words == null || words.length == 0)
+            return result;
+        for (String s : words) {
+            for (char c : s.toCharArray()) {
+                degree.put(c, 0);
+            }
+        }
+        for (int i = 0; i < words.length - 1; i++) {
+            boolean flag = false;
+            String cur = words[i];
+            String next = words[i + 1];
+            int length = Math.min(cur.length(), next.length());
+            for (int j = 0; j < length; j++) {
+                char c1 = cur.charAt(j);
+                char c2 = next.charAt(j);
+                if (c1 != c2) {
+                    Set<Character> set = new HashSet<Character>();
+                    if (map.containsKey(c1))
+                        set = map.get(c1);
+                    if (!set.contains(c2)) {
+                        set.add(c2);
+                        map.put(c1, set);
+                        degree.put(c2, degree.get(c2) + 1);
+                    }
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (flag == false && next.length() < cur.length()) {
+                return "";
+            }
+        }
+        Queue<Character> q = new LinkedList<Character>();
+        for (char c : degree.keySet()) {
+            if (degree.get(c) == 0)
+                q.add(c);
+        }
+        while (!q.isEmpty()) {
+            char c = q.remove();
+            result += c;
+            if (map.containsKey(c)) {
+                for (char c2 : map.get(c)) {
+                    degree.put(c2, degree.get(c2) - 1);
+                    if (degree.get(c2) == 0)
+                        q.add(c2);
+                }
+            }
+        }
+
+        if (result.length() != degree.size()) {
+            return "";
+        }
+
+        return result;
+    }
+}
+
+Q-33 :- Water Jug problem using BFS
+
+class Pair{
+    int j1, j2;
+    List<Pair> path;
+ 
+    Pair(int j1, int j2){
+        this.j1 = j1;
+        this.j2 = j2;
+        path = new ArrayList<>();
+    }
+ 
+    Pair(int j1, int j2, List<Pair> _path){
+        this.j1 = j1;
+        this.j2 = j2;
+ 
+        path = new ArrayList<>();
+        path.addAll(_path);
+        path.add(new Pair(this.j1,this.j2));
+    }
+}
+ 
+public class Solution{
+   
+     private static void getPathIfPossible(int jug1, int jug2, int target){
+        boolean[][] visited = new boolean[jug1+1][jug2+1];
+        Queue<Pair> queue = new LinkedList<>();
+ 
+        Pair initialState = new Pair(0,0);
+        initialState.path.add(new Pair(0,0));
+        queue.offer(initialState);
+ 
+        while(!queue.isEmpty()){
+            Pair curr = queue.poll();
+
+            if(curr.j1 > jug1 || curr.j2 > jug2 || visited[curr.j1][curr.j2])
+                continue;
+
+            visited[curr.j1][curr.j2] = true;
+
+            if(curr.j1 == target || curr.j2 == target){
+                if(curr.j1 == target){
+
+                    curr.path.add(new Pair(curr.j1,0));
+                }
+                else{
+
+                    curr.path.add(new Pair(0,curr.j2));
+                }
+                int n = curr.path.size();
+                System.out.println("Path of states of jugs followed is :");
+                for(int i = 0; i < n; i++)
+                    System.out.println(curr.path.get(i).j1+" , "+curr.path.get(i).j2);
+                return;
+            }
+
+            queue.offer(new Pair(jug1, 0, curr.path));
+            queue.offer(new Pair(0, jug2, curr.path));
+
+            queue.offer(new Pair(jug1, curr.j2, curr.path));
+            queue.offer(new Pair(curr.j1, jug2, curr.path));
+
+            queue.offer(new Pair(0, curr.j2, curr.path));
+            queue.offer(new Pair(curr.j1, 0, curr.path));
+
+            int emptyJug = jug2-curr.j2;
+            int amountTransferred = Math.min(curr.j1, emptyJug);
+            int j2 = curr.j2+amountTransferred;
+            int j1 = curr.j1-amountTransferred;
+            queue.offer(new Pair(j1, j2,curr.path));
+
+            emptyJug = jug1-curr.j1;
+            amountTransferred = Math.min(curr.j2, emptyJug);
+            j2 = curr.j2-amountTransferred;
+            j1 = curr.j1+amountTransferred;
+            queue.offer(new Pair(j1, j2,curr.path));
+        }
+ 
+        System.out.println("Not Possible to obtain target");
+    }
+}
+
+Q-34 :- Travelling Salesman Problem
+class Solution   
+{  
+    
+    private int findHamiltonianCycle(int[][] distance, boolean[] visitCity, int currPos, int cities, int count, int cost, int hamiltonianCycle)   
+    {  
+    
+        if (count == cities && distance[currPos][0] > 0)   
+        {  
+            hamiltonianCycle = Math.min(hamiltonianCycle, cost + distance[currPos][0]);  
+            return hamiltonianCycle;  
+        }  
+    
+        // BACKTRACKING STEP  
+        for (int i = 0; i < cities; i++)   
+        {  
+            if (visitCity[i] == false && distance[currPos][i] > 0)   
+            {  
+    
+                // Mark as visited  
+                visitCity[i] = true;  
+                hamiltonianCycle = findHamiltonianCycle(distance, visitCity, i, cities, count + 1, cost + distance[currPos][i], hamiltonianCycle);  
+    
+                // Mark ith node as unvisited  
+                visitCity[i] = false;  
+            }  
+        }  
+        return hamiltonianCycle;  
+    }  
+    
+    public int TravellingSalesman(int cities,int[][] distance)  
+    {  
+    
+        boolean[] visitCity = new boolean[cities];  
+    
+        visitCity[0] = true;    
+          
+        int hamiltonianCycle = Integer.MAX_VALUE;  
+
+        return findHamiltonianCycle(distance, visitCity, 0, cities, 1, 0, hamiltonianCycle);  
+    }  
+} 
+
+Q-35 :- Total Spanning Trees
+class Solution {
+	private static int findDeterminant(ArrayList<ArrayList<Integer>> Matrix) {
+		int det = 0;
+		if (Matrix.size() == 1) {
+			return Matrix.get(0).get(0);
+		}
+
+		else if (Matrix.size() == 2) {
+			det = (Matrix.get(0).get(0) * Matrix.get(1).get(1) - Matrix.get(0).get(1) * Matrix.get(1).get(0));
+			return det;
+		}
+
+		else {
+			for (int p = 0; p < Matrix.get(0).size(); p++) {
+				ArrayList<ArrayList<Integer>> tempMatrix = new ArrayList<ArrayList<Integer>>();
+				for (int i = 1; i < Matrix.size(); i++) {
+					ArrayList<Integer> row = new ArrayList<Integer>();
+					for (int j = 0; j < Matrix.get(i).size(); j++) {
+						if (j != p) {
+							row.add(Matrix.get(i).get(j));
+						}
+					}
+					if (row.size() > 0) {
+						tempMatrix.add(row);
+					}
+				}
+				det = det + Matrix.get(0).get(p) * (int) Math.pow(-1, p) * findDeterminant(tempMatrix);
+			}
+			return det;
+		}
+	}
+
+	public static int spanningTrees(ArrayList<ArrayList<Integer>> adjMatrix, int n, int m) {
+
+		ArrayList<Integer> degree = new ArrayList<Integer>();
+		for (int i = 0; i < n; i++) {
+			degree.add(0);
+		}
+
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (adjMatrix.get(i).get(j).intValue() == 1) {
+
+					degree.set(i, degree.get(i) + 1);
+				}
+			}
+		}
+
+		for (int i = 0; i < n; i++) {
+			adjMatrix.get(i).set(i, degree.get(i));
+		}
+
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if ((i != j) && adjMatrix.get(i).get(j) == 1) {
+					adjMatrix.get(i).set(j, -1);
+				}
+
+			}
+
+		}
+
+		ArrayList<ArrayList<Integer>> submatrix = new ArrayList<ArrayList<Integer>>();
+		for (int i = 0; i < n - 1; i++) {
+			submatrix.add(new ArrayList<Integer>());
+			for (int j = 0; j < n - 1; j++) {
+				submatrix.get(i).add(adjMatrix.get(i + 1).get(j + 1));
+			}
+		}
+
+		return findDeterminant(submatrix);
+	}
+} 
+
+Q-36 :- Word Ladder
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> word) {
+        Set<String> ansseq = new HashSet<String>();
+        ansseq.add(beginWord);
+        Set<String> wordDict= new HashSet<String>();
+        for(String s:word) wordDict.add(s);
+        if(!wordDict.contains(endWord)) return 0;
+        int distance = 1;
+        while (!ansseq.contains(endWord)) {
+            Set<String> temp = new HashSet<String>();
+            for (String a : ansseq) {
+                for (int i = 0; i < a.length(); i++) {
+                    char[] cha = a.toCharArray();
+                    for (char ch = 'a'; ch <= 'z'; ch++) {
+                        cha[i] = ch;
+                        String poss = new String(cha);
+                        if (wordDict.contains(poss)) {
+                            temp.add(poss);
+                            wordDict.remove(poss);
+                        }
+                    }
+                }
+            }
+            distance++;
+            if (temp.size() == 0) return 0;
+            ansseq = temp;
+        }
+        return distance;
+    }
+}
+
+Q-37 :- Minimize Cash Flow among a given set of friends who have borrowed money from each other
+class Solution
+{
+
+    public void minCashFlowRec(int amount[])
+    {
+
+        int mxCredit=0;  
+        int mxDebit=0;
+        for (int i = 1; i < N; i++){
+            if (arr[i] < amount[minInd])
+                minInd = i;
+            if (amount[i] > amount[maxInd])
+                maxInd= i;
+        }
+
+        if (amount[mxCredit] == 0 && amount[mxDebit] == 0)
+            return;
+
+        int min = Math.min(-amount[mxDebit], amount[mxCredit]);
+        amount[mxCredit] -= min;
+        amount[mxDebit] += min;
+
+        System.out.println("Person " + mxDebit + " pays " + min
+                                + " to " + "Person " + mxCredit);
+
+        minCashFlowRec(amount);
+    }
+
+    static void minCashFlow(int graph[][], int N)
+    {
+
+        int amount[]=new int[N];
+
+        for (int p = 0; p < N; p++)
+        for (int i = 0; i < N; i++)
+            amount[p] += (graph[i][p] - graph[p][i]);
+     
+        minCashFlowRec(amount);
+    }
+}

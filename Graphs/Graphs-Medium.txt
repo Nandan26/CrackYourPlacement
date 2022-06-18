@@ -1,0 +1,920 @@
+Q-8 :- Minimum steps to reach target by a Knight
+class Cell {
+	int xCoordinate, yCoordinate;
+	int stepCount;
+
+	Cell() {
+	}
+
+	Cell(int x, int y, int step) {
+		xCoordinate = x;
+		yCoordinate = y;
+		stepCount = step;
+	}
+}
+
+class Solution {
+
+	private static boolean isInside(int x, int y, int n) {
+		if (x >= 1 && x <= n && y >= 1 && y <= n) {
+			return true;
+		}
+		return false;
+	}
+
+	public static int minSteps(Pair knightPosition, Pair targetPosition, int size) {
+
+		int directionX[] = { -2, -1, 1, 2, -2, -1, 1, 2 };
+		int directionY[] = { -1, -2, -2, -1, 1, 2, 2, 1 };
+
+		Queue<Cell> q = new LinkedList<>();
+
+		q.add(new Cell(knightPosition.first, knightPosition.second, 0));
+		Cell temp = new Cell();
+		int x, y;
+		boolean visited[][] = new boolean[size + 1][size + 1];
+
+		for (int i = 1; i <= size; i++) {
+			for (int j = 1; j <= size; j++) {
+				visited[i][j] = false;
+			}
+		}
+		visited[knightPosition.first][knightPosition.second] = true;
+		while (!q.isEmpty()) {
+			temp = q.poll();
+
+			if (temp.xCoordinate == targetPosition.first && temp.yCoordinate == targetPosition.second) {
+				return temp.stepCount;
+			}
+			for (int i = 0; i < 8; i++) {
+				x = temp.xCoordinate + directionX[i];
+				y = temp.yCoordinate + directionY[i];
+
+				if (isInside(x, y, size) && !visited[x][y]) {
+					visited[x][y] = true;
+					q.add(new Cell(x, y, temp.stepCount + 1));
+				}
+			}
+
+		}
+		return temp.stepCount;
+	}
+}
+
+Q-9 :- Decode String
+class Solution {
+    public String decodeString(String s) {
+        Stack<Integer> st = new Stack<>();
+        Stack<StringBuilder> stringst = new Stack<>();     
+        int cnt = 0;
+        stringst.push(new StringBuilder());
+        for(int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if(ch == '[') {
+                stringst.push(new StringBuilder());
+                st.push(cnt);
+                cnt = 0;
+            } else if(ch == ']') {
+                String str = stringst.pop().toString(); 
+                int times = st.pop();
+                StringBuilder string = stringst.peek();
+                for(int j = 0; j < times; j++){
+                    string.append(str);
+                    //System.out.println(string.toString());
+                }
+            }  else if(ch - '0' >= 0 && ch - '0' <= 9) {
+                cnt = cnt * 10 + (ch - '0');
+            } else {
+                stringst.peek().append(ch);
+            }
+        }
+        
+        return stringst.pop().toString(); 
+    }
+}
+
+Q-10 :- Shortest Bridge
+class Solution {
+    int[][] dir= new int[][]{{0,1},{0,-1},{1,0},{-1,0}};
+    public int shortestBridge(int[][] grid) {
+                
+        int n = grid.length;
+        
+        int mark = -1;
+        
+        boolean[][] visited=  new boolean[n][n];
+        Queue<int[]> q = new LinkedList<>();
+        
+        for(int i = 0; i < n; i++){
+            for(int j =  0; j < n; j++){
+                if(!visited[i][j] && grid[i][j] == 1){
+                    dfs(grid, i, j, mark--, visited);
+                }
+                if(grid[i][j] == -1){
+                    q.add(new int[]{i, j, 0});
+                }
+            }
+        }
+        
+        visited = new boolean[n][n];
+        int minZeroes = bfs(grid, q, visited);
+        
+        return minZeroes;
+        
+    }
+    
+	private int bfs(int[][] grid, Queue<int[]> queue, boolean[][] visited){
+        
+        int n = grid[0].length;
+        
+        int minZeroes = Integer.MAX_VALUE;
+        
+        while(!queue.isEmpty()){
+            
+            int[] cur = queue.poll();
+            
+            int level = cur[2];
+            
+            for(int[] d:dir){
+                
+                int x = cur[0]+d[0];
+                int y = cur[1]+d[1];
+                
+                
+                if(x<0 || x>=n || y<0 || y>= n || grid[x][y] == -1 || visited[x][y]){
+                    continue;
+                }
+                
+                
+                if(grid[x][y] == -2) {
+                    minZeroes = Math.min(minZeroes, level++);
+                    continue;
+                }
+                
+                visited[x][y] = true;
+                
+                queue.offer(new int[]{x, y, level + 1});
+            } 
+        }
+        
+        return minZeroes;
+    }
+    private void dfs(int[][] grid, int row, int col, int color,  boolean[][] visited){
+        
+        if(row < 0 || col < 0 || row >= grid.length || col >= grid[0].length || visited[row][col] || grid[row][col] != 1 )  
+            return;
+      
+        visited[row][col] = true;
+        grid[row][col] = color;
+        
+        dfs(grid, row - 1, col, color, visited);
+        dfs(grid, row + 1, col, color, visited);
+        dfs(grid, row, col  + 1, color, visited);
+        dfs(grid, row, col - 1, color, visited);
+
+        return;
+
+    }
+}
+
+
+Q-11 :- Number of operations to make network connected
+class Solution {
+    List<List<Integer>> adj;
+    boolean[] vis;
+    int cnt=0;
+    public int makeConnected(int n, int[][] connections) {
+        int size=connections.length;
+        
+        if(size<n-1)
+            return -1;
+        
+        adj=new ArrayList<>();
+        vis=new boolean[n];
+        
+        for(int i=0;i<n;i++)
+            adj.add(new ArrayList());
+        
+        for(int i=0;i<connections.length;i++)
+        {
+            int p=connections[i][0];
+            int q=connections[i][1];
+            adj.get(p).add(q);
+            adj.get(q).add(p);
+        }
+        
+        for(int i=0;i<n;i++)
+        {
+            if(!vis[i])
+            {
+                helper(adj,i);
+            }
+        }
+        return n-1-cnt;
+    }
+    private void helper(List<List<Integer>> adj, int idx)
+    {
+        vis[idx]=true;
+        for(int i:adj.get(idx))
+        {
+            if(!vis[i]){
+                cnt++;
+                helper(adj,i);
+            }
+        }
+    }
+}
+
+Q-12 :- Find Eventual Safe States
+class Solution {
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+        List<Integer> res = new ArrayList<Integer>();
+        int[] vis = new int[graph.length];
+
+        for (int i = 0; i < graph.length; i++) {
+            if (helper(i, graph, vis)) {
+                res.add(i);
+            }
+        }
+        
+        return res;
+    }
+    
+    private boolean helper(int index, int[][] graph, int[] visited) {
+        if (visited[index] == 1) {
+            return false;
+        }
+        
+        if (visited[index] == 2) {
+            return true;
+        }
+
+        visited[index] = 1;
+        int[] neighbor = graph[index];
+
+        for (int i = 0; i < neighbor.length; i++) {
+            if (!helper(neighbor[i], graph, visited)) {
+                return false;
+            }
+        }
+
+        visited[index] = 2;
+        return true;
+    }
+
+}
+
+Q-13 :- Strongly Connected Components (Kosaraju's Algo) 
+class Solution {
+	public static int kosaraju(ArrayList<ArrayList<Integer>> list, int N) {
+		int count = 0;
+		Stack<Integer> stack = new Stack<>();
+		boolean[] visited = new boolean[N];
+		for (int i = 0; i < N; i++) {
+			if (!visited[i]) {
+				dfs(list, visited, i, stack);
+			}
+		}
+		ArrayList<ArrayList<Integer>> tanspose = transpose(list, N);
+		visited = new boolean[N];
+		while (!stack.isEmpty()) {
+			int cur = stack.pop();
+			if (!visited[cur]) {
+
+				dfs(tanspose, visited, cur);
+				count++;
+            
+            }			}
+		}
+
+		return count;
+	}
+
+	private static void dfs(ArrayList<ArrayList<Integer>> graph, boolean[] visited, int cur) {
+		visited[cur] = true;
+		for (Integer neighbour : graph.get(cur)) {
+			if (!visited[neighbour]) {
+				dfs(graph, visited, neighbour);
+			}
+		}
+	}
+
+	private static void dfs(ArrayList<ArrayList<Integer>> graph, boolean[] visited, int cur, Stack<Integer> stack) {
+		visited[cur] = true;
+		for (Integer neighbour : graph.get(cur)) {
+			if (!visited[neighbour]) {
+				dfs(graph, visited, neighbour, stack);
+			}
+		}
+		stack.push(cur);
+	}
+
+	private static ArrayList<ArrayList<Integer>> transpose(ArrayList<ArrayList<Integer>> graph, int N) {
+		ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+		for (int i = 0; i < N; i++) {
+			result.add(new ArrayList<Integer>());
+		}
+		for (int i = 0; i < N; i++) {
+			for (Integer target : graph.get(i)) {
+				result.get(target).add(i);
+			}
+		}
+		return result;
+    }
+}
+
+Q-14 :- Time Nedded to inform all employees
+class Solution {
+    class pair{
+        int u;
+        int infoTime;
+        pair(int u,int infoTime){
+            this.u=u;
+            this.infoTime=infoTime;
+        }
+    }
+    public int numOfMinutes(int n, int headID, int[] manager, int[] informTime) {
+        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < manager.length; i++) 
+			graph.add(new ArrayList<Integer>());
+
+        for( int i = 0 ; i < manager.length ; i++ ){
+            int par = manager[i];
+            if( par != -1 ){ 
+                graph.get(par).add(i);
+            }
+        }
+        int totalTime = 0;
+        LinkedList<pair> q=new LinkedList<>();
+        
+        q.addLast( new pair( headID , 0 ) );
+        
+        while(q.size()>0){
+            int size=q.size();
+            while(size-->0){
+                pair temp=q.removeFirst();
+                
+                int  u= temp.u;
+                int Time = temp.infoTime;
+                
+                
+                
+                int timetaken = informTime[u];
+                for(int v : graph.get(u) ){
+                    totalTime=Math.max(Time + timetaken, totalTime);
+                    q.addLast( new pair( v , Time + timetaken ) );
+                }
+            }
+        }
+        return totalTime;
+
+    }
+}
+
+Q-15 :- Graph coloring problem
+class Solution {
+    public static boolean graphColoring(List < Integer > [] G, int[] color, int i, int C) {
+        // Your code here
+        int n = G.length;
+        if (solve(i, G, color, n, C) == true) return true;
+        return false;
+    }
+    private static boolean isSafe(int node, List < Integer > [] G, int[] color, int n, int col) {
+        for (int it: G[node]) {
+            if (color[it] == col) return false;
+        }
+        return true;
+    }
+    private static boolean solve(int node, List < Integer > [] G, int[] color, int n, int m) {
+        if (node == n) return true;
+
+        for (int i = 1; i <= m; i++) {
+            if (isSafe(node, G, color, n, i)) {
+                color[node] = i;
+                if (solve(node + 1, G, color, n, m) == true) return true;
+                color[node] = 0;
+            }
+        }
+        return false;
+    }
+}
+
+Q-16 :- 
+class Solution {
+    public int removeStones(int[][] stones) {
+        int n = stones.length;
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        for (int [] stone : stones) {
+            map.computeIfAbsent(stone[0], x -> new ArrayList<>()).add(~stone[1]);
+            map.computeIfAbsent(~stone[1], x -> new ArrayList<>()).add(stone[0]);
+        }
+        int component = 0;
+        Set<Integer> visited = new HashSet<>();
+        for (int [] stone : stones) {
+            for (int i=0; i<2; i++) {
+                int current = i == 0 ? stone[0] : ~stone[1];
+                if (!visited.contains(current)) {
+                    component += 1;
+                    dfs(map, visited, current);
+                }
+            }
+        }
+        return n - component;
+    }
+    
+    public void dfs(Map<Integer, List<Integer>> map, Set<Integer> visited, int i) {
+        if (visited.contains(i))
+            return;
+        visited.add(i);
+        List<Integer>children = map.get(i);
+        for (Integer child : children) {
+            if (!visited.contains(child)) {
+                dfs(map, visited, child);
+            }
+        } 
+    }
+}
+
+Q-17 :- As Far from Land as Possible
+class Solution {
+    class Pair{
+        int x;
+        int y;
+        
+        Pair(int x ,int y ){
+            this.x=x;
+            this.y=y;
+        }
+    }
+    private int [][] dirs={{-1,0},{0,1},{1,0},{0,-1}};
+    public int maxDistance(int[][] grid) {
+        ArrayDeque<Pair> q=new ArrayDeque<>();
+        
+        for(int i=0;i<grid.length;i++ ){
+            for(int j =0;j<grid[i].length;j++){
+                if(grid[i][j]==1){
+                    q.add(new Pair(i,j));
+                    
+                }
+            }
+        }
+        
+        if(q.size()==grid.length*grid[0].length){
+            return -1;
+        }
+        
+        
+        int level=-1;
+        while(q.size()!=0){
+            int size=q.size();
+            level++;
+            while(size-->0){
+                Pair temp=q.removeFirst();
+            
+                for(int i =0;i<dirs.length;i++){
+                    int newrow=temp.x+dirs[i][0];
+                    int newcol=temp.y+dirs[i][1];
+                
+                    if(newrow>=0 && newcol>=0 && newrow<grid.length && newcol<grid[0].length && grid[newrow][newcol]==0){
+                        grid[newrow][newcol]=1;
+                        q.add(new Pair(newrow,newcol));
+                    }
+                }
+            }
+        }
+        return level;
+    }
+}
+
+
+
+Q-18 :- Find the City With the Smallest Number of Neighbors at a Threshold Distance
+class Solution {
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        int[][] dis = new int[n][n];
+        int res = 0, smallest = n;
+        for (int[] row : dis)
+            Arrays.fill(row, 100001);
+        for (int[] e : edges){
+            dis[e[0]][e[1]] = dis[e[1]][e[0]] = e[2];
+        }
+            
+        for (int i = 0; i < n; ++i)
+            dis[i][i] = 0;
+        for (int k = 0; k < n; ++k)
+            for (int i = 0; i < n; ++i)
+                for (int j = 0; j < n; ++j)
+                    dis[i][j] = Math.min(dis[i][j], dis[i][k] + dis[k][j]);
+        
+        for (int i = 0; i < n; i++) {
+            int count = 0;
+            for (int j = 0; j < n; ++j)
+                if (dis[i][j] <= distanceThreshold)
+                    ++count;
+            if (count <= smallest) {
+                ans = i;
+                smallest = count;
+            }
+        }
+        return ans;
+    }
+}
+
+Q-19 :- Find whether it is possible to finish all tasks or not from given dependencies
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) 
+			adj.add(new ArrayList<Integer>());
+
+        for(int[] a:prerequisites){
+            adj.get(a[1]).add(a[0]);
+        }
+        
+        boolean[] visited = new boolean[numCourses];
+        boolean[] checkNoCycle = new boolean[numCourses];
+
+        for(int i=0; i<numCourses; i++){
+            if(dfscycle(adj,visited,i,checkNoCycle))
+                return false;
+        }
+        return true;
+    }
+    
+    private boolean dfscycle(ArrayList<ArrayList<Integer>> adj, boolean[] visited, int course,boolean[] checkNoCycle){
+        if(visited[course]){
+            return true;
+        }
+        if(checkNoCycle[course]) return false;
+        
+        else
+            visited[course] = true;
+        
+        for(int c:adj.get(course)){
+            if(dfscycle(adj,visited,c,checkNoCycle))
+                return true;
+        }
+        visited[course] = false;
+        
+        checkNoCycle[course] = true;
+        return false;
+    }
+}
+
+Q-20:- MST using prim's algo
+class Node implements Comparator < Node > {
+    private int v;
+    private int weight;
+
+    Node(int _v, int _w) {
+        v = _v;
+        weight = _w;
+    }
+
+    Node() {}
+
+    int getV() {
+        return v;
+    }
+    int getWeight() {
+        return weight;
+    }
+
+    @Override
+    public int compare(Node node1, Node node2) {
+        if (node1.weight < node2.weight)
+            return -1;
+        if (node1.weight > node2.weight)
+            return 1;
+        return 0;
+    }
+}
+
+class Solution{
+    int[] primsAlgo(ArrayList < ArrayList < Node >> adj, int N) {
+        int key[] = new int[N];
+        int parent[] = new int[N];
+        boolean mstSet[] = new boolean[N];
+        for (int i = 0; i < N; i++) {
+            key[i] = 100000000;
+            mstSet[i] = false;
+        }
+
+        PriorityQueue < Node > pq = new PriorityQueue < Node > (N, new Node());
+
+        key[0] = 0;
+        parent[0] = -1;
+        pq.add(new Node(key[0], 0));
+
+        while (!pq.isEmpty()) {
+            int u = pq.poll().getV();
+            mstSet[u] = true;
+
+            for (Node it: adj.get(u)) {
+                if (mstSet[it.getV()] == false && it.getWeight() < key[it.getV()]) {
+                    parent[it.getV()] = u;
+                    key[it.getV()] = it.getWeight();
+                    pq.add(new Node(it.getV(), key[it.getV()]));
+                }
+            }
+        }
+        return parent;
+
+    }
+}
+
+Q-21 :- Floyd Warshall 
+class Solution
+{
+    final static int INF = 99999;
+ 
+    int[] floydWarshall(int graph[][],int V)
+    {
+        int dist[][] = new int[V][V];
+        int i, j, k;
+
+        for (i = 0; i < V; i++)
+            for (j = 0; j < V; j++)
+                dist[i][j] = graph[i][j];
+ 
+        for (k = 0; k < V; k++)
+        {
+            // Pick all vertices as source one by one
+            for (i = 0; i < V; i++)
+            {
+                // Pick all vertices as destination for the
+                // above picked source
+                for (j = 0; j < V; j++)
+                {
+                    // If vertex k is on the shortest path from
+                    // i to j, then update the value of dist[i][j]
+                    if (dist[i][k] + dist[k][j] < dist[i][j])
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+
+        return dist;
+    }
+}
+
+Q-22 :- Evaluate Division
+class Solution {
+    
+    private  Map<String, Map<String, Double>> makeGraph(List<List<String>> e, double[] values){
+
+        Map<String, Map<String, Double>> graph = new HashMap<>();
+        String u, v;
+        
+        for(int i = 0; i < e.size(); i++){
+            u = e.get(i).get(0);
+            v = e.get(i).get(1);
+            
+            graph.putIfAbsent(u, new HashMap<>());
+            graph.get(u).put(v, values[i]);
+            
+            graph.putIfAbsent(v, new HashMap<>());
+            graph.get(v).put(u, 1/values[i]);
+            
+        }
+        return graph;
+    }
+    
+    private double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        Map<String, Map<String, Double>> graph = makeGraph(equations, values);
+        
+        double []ans = new double[queries.size()];
+
+        for(int i = 0; i < queries.size(); i++){
+            ans[i] = dfs(queries.get(i).get(0) , queries.get(i).get(1) , new HashSet<>(), graph);
+        }
+        return ans;
+    }
+    
+    public double dfs(String src, String dest, Set<String> visited, Map<String, Map<String, Double>> graph){
+
+        if(graph.containsKey(src) == false)
+            return -1.0;
+
+        if(graph.get(src).containsKey(dest)){
+            return graph.get(src).get(dest);
+        }
+        
+        visited.add(src);
+        
+        for(Map.Entry<String, Double> nbr : graph.get(src).entrySet()){
+            if(visited.contains(nbr.getKey()) == false){
+                double weight = dfs(nbr.getKey(), dest, visited, graph);
+
+                if(weight != -1.0){
+                    return nbr.getValue() * weight;
+                }
+            }
+        }
+        return -1.0;
+    }
+}
+
+Q-23 :- Snakes and Ladders
+class Solution {
+    public int snakesAndLadders(int[][] grid) {
+        int n=grid.length;
+        int[] board=new int[(n*n)+1];
+        boolean []vis=new boolean[(n*n)+1];
+        ArrayDeque<Integer> qu=new ArrayDeque<>();
+        int i=n-1;boolean f=true;
+        int count=1;
+        while(i>=0)
+        {
+            if(f)
+            {
+                int j=0;
+                while(j<n)
+                    board[count++]=grid[i][j++];
+            }
+            else
+            {
+                int j=n-1;
+                while(j>=0)
+                    board[count++]=grid[i][j--];
+            }
+            f=!f;
+            i--;
+        }
+        qu.offerLast(board[1]==-1?1:board[1]);
+        if(board[1]==n*n) return 1;
+        vis[board[1]==-1?1:board[1]]=true;
+        int moves=1;
+        while(!qu.isEmpty())
+        {
+            int lv=qu.size();
+            for(int j=0;j<lv;j++)
+            {
+                int cur=qu.poll();
+                for(int k=1;k<=6;k++)
+                {
+                    int temp=cur+k;
+                    if(temp<=n*n && !vis[temp])
+                    {
+                         vis[temp]=true;
+                        if(board[temp]!=-1)
+                            temp=board[temp];
+                        qu.offerLast(temp);   
+                         if(temp==n*n) return moves; 
+                    }
+                }
+            }
+            moves++;
+        }
+        return -1;
+    }
+}
+
+Q-24 :- Topological sort
+class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] indegree = new int[numCourses];
+        List<List<Integer>> adj = new ArrayList<>();
+        Queue<Integer> q = new LinkedList<>();
+        
+        int[] ans = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            adj.add(new ArrayList<Integer>());
+        }
+        for (int i = 0; i < prerequisites.length; i++) {
+            int course = prerequisites[i][0], prere = prerequisites[i][1];
+            indegree[course]++;
+            adj.get(prere).add(course);
+        }
+        
+        for (int i = 0; i < numCourses; i++) {
+            if (indegree[i] == 0) 
+                q.offer(i);
+        }
+        int time=0;
+        while (!q.isEmpty()) {
+            int pre = q.poll();
+            ans[time++] = pre;
+            for (int courses: adj.get(pre)) {
+                indegree[courses]--;
+                if (indegree[courses]== 0) 
+                    q.offer(courses);
+            }
+        }
+        if(time == numCourses) {
+            return ans;
+        }
+        else {
+            return new int[0];
+        }
+    }
+}
+
+Q-25 :- Cheapest Flights Within K Stops
+class Solution {
+    
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        
+        int[][] dp = new int[k + 1][n];
+
+        for (int stops = 0; stops <= k; stops++) {
+            for (int city = 0; city < n; city++) {
+                if (city == src) dp[stops][city] = 0;
+                else dp[stops][city] = Integer.MAX_VALUE;
+            }
+        }
+
+        for (int[] flight : flights) {
+            int source = flight[0], dest = flight[1], cost = flight[2];
+            if (source == src) dp[0][dest] = cost;
+        }
+        
+        for (int stops = 1; stops <= k; stops++) {
+
+            for (int city = 0; city < n; city++) dp[stops][city] = dp[stops - 1][city];
+            
+            for (int[] flight : flights) {
+                
+                int source = flight[0], dest = flight[1], cost = flight[2];
+
+                if (dp[stops - 1][source] == Integer.MAX_VALUE) continue;
+                
+                if (dp[stops - 1][source] + cost < dp[stops][dest]) {
+                    dp[stops][dest] = dp[stops - 1][source] + cost;
+                }
+            }
+
+        }
+        
+        return dp[k][dst] == Integer.MAX_VALUE? -1 : dp[k][dst];
+    }
+}
+
+Q-26 :- Detect a negative Cycle
+class Solution {
+    public boolean isNegCycleBellmanFord(Graph graph, int src) {
+        int V = graph.V;
+        int E = graph.E;
+        int[] dist = new int[V];  
+
+        for (int i = 0; i < V; i++)
+            dist[i] = Integer.MAX_VALUE;
+        dist[src] = 0;
+
+        for (int i = 1; i <= V - 1; i++) {
+            for (int j = 0; j < E; j++) {
+                int u = graph.edge[j].src;
+                int v = graph.edge[j].dest;
+                int weight = graph.edge[j].weight;
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v])
+                    dist[v] = dist[u] + weight;
+            }
+        }
+
+        for (int i = 0; i < E; i++) {
+            int u = graph.edge[i].src;
+            int v = graph.edge[i].dest;
+            int weight = graph.edge[i].weight;
+            if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v])
+                return true;
+        }
+  
+        return false;
+    }
+}
+
+Q-27:- Bipartite Graph
+class Solution {
+    static boolean dfsCheck(ArrayList < ArrayList < Integer >> graph, int node, int color[]) {
+        for (Integer it: graph.get(node)) {
+            if (color[it] == -1) {
+                //Color of variable neighbor is the inverted color of variable node
+                color[it] = 1 - color[node];
+
+                if (!dfsCheck(graph, it, color))
+                    return false;
+            } else if (color[it] == color[node]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean checkBipartite(ArrayList < ArrayList < Integer >> graph, int n) {
+        int color[] = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            color[i] = -1;
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (color[i] == -1) {
+                if (!dfsCheck(graph, i, color)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+   
