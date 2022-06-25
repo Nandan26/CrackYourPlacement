@@ -1,0 +1,452 @@
+Q-1 :- Design Add and Search Words Data Structure
+class WordDictionary {
+
+    Trie root = new Trie();
+    
+    public void addWord(String word) {
+        Trie node = root;
+        for(int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            if (node.child[c-'a'] == null) {
+                node.child[c-'a'] = new Trie();
+                node = node.child[c-'a'];
+            } else {
+                node = node.child[c-'a'];
+            }
+        }
+        node.flag = true;
+    }
+
+
+    public boolean search(String word) {
+        Trie node = root;
+        return helper(word,0,node);
+    }
+    private boolean helper(String word, int start, Trie cur) {
+        if (start == word.length()) {
+            return cur.flag;
+        }
+        char c = word.charAt(start);
+        if (c == '.') {
+            for (int i = 0; i < 26; i++) {
+                if (cur.child[i] != null) {
+                    if (helper(word,start+1,cur.child[i])) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if (cur.child[c-'a'] == null) {
+                return false;
+            } else {
+                return helper(word,start+1,cur.child[c-'a']);
+            }
+        }
+        return false;
+    }
+    class Trie {
+        Trie[] child;
+        char c;
+        boolean flag;
+        public Trie() {
+            child = new Trie[26];
+            flag = false;
+        }
+    }
+}
+
+Q-2 :-  Word Break Problem
+
+class Solution {
+    class Trie {
+        Trie children[];
+
+        boolean isEndOfWord;
+
+        Trie()
+        {
+            children = new Trie[26];
+            for (int i = 0; i < 26; i++)
+                children[i] = null;
+ 
+            isEndOfWord = false;
+        }
+    }
+
+    static void insert(Trie root, String key)
+    {
+        Trie temp = root;
+ 
+        for (int i = 0; i < key.length(); i++) {
+            int index = key.charAt(i) - 'a';
+            if (temp.children[index] == null)
+                temp.children[index] = new Trie();
+ 
+            temp = temp.children[index];
+        }
+
+        temp.isEndOfWord = true;
+    }
+
+    static boolean search(Trie root, String key)
+    {
+        Trie tp = root;
+ 
+        for (int i = 0; i < key.length(); i++) {
+            int index = key.charAt(i) - 'a';
+            if (rp.children[index] == null)
+                return false;
+ 
+            tp = tp.children[index];
+        }
+        return (tp != null && tp.isEndOfWord);
+    }
+
+    static boolean wordBreak(String str, Trie root)
+    {
+
+        
+        int size = str.length();
+
+        if (size == 0)
+            return true;
+
+        for (int i = 1; i <= size; i++) {
+ 
+
+            if (search(root, str.substring(0, i))
+                && wordBreak(str.substring(i, size), root))
+                return true;
+        }
+
+        return false;
+    }
+    
+    public boolean[] wordbreak(String[] dictionary,String check){
+        int n = dictionary.length;
+        TrieNode root = new TrieNode();
+        boolean[] ans=new boolean[n];
+        
+        for (int i = 0; i < n; i++)
+            insert(root, dictionary[i]);
+        
+        return wordbreak(check,root);
+ 
+    } 
+}
+
+Q-3 :- Trie | (Insert and Search)
+
+class Solution{
+
+    Trie root = new Trie();
+    
+    public void addWord(String word) {
+        Trie node = root;
+        for(int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            if (node.child[c-'a'] == null) {
+                node.child[c-'a'] = new Trie();
+                node = node.child[c-'a'];
+            } else {
+                node = node.child[c-'a'];
+            }
+        }
+        node.flag = true;
+    }
+
+
+    public boolean search(String word) {
+        Trie node = root;
+        return helper(word,0,node);
+    }
+    private boolean helper(String word, int start, Trie cur) {
+        if (start == word.length()) {
+            return cur.flag;
+        }
+        char c = word.charAt(start);
+        if (c == '.') {
+            for (int i = 0; i < 26; i++) {
+                if (cur.child[i] != null) {
+                    if (helper(word,start+1,cur.child[i])) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if (cur.child[c-'a'] == null) {
+                return false;
+            } else {
+                return helper(word,start+1,cur.child[c-'a']);
+            }
+        }
+        return false;
+    }
+    class Trie {
+        Trie[] child;
+        char c;
+        boolean flag;
+        public Trie() {
+            child = new Trie[26];
+            flag = false;
+        }
+    }
+}
+
+Q-4 :- Print Anagrams Together 
+
+class Main
+{
+    class TrieNode
+    {
+
+         Map<Character, TrieNode> child = new HashMap<>();
+
+         String words = "";
+    }
+ 
+    public static void insert(TrieNode root, String word, String originalWord)
+    {
+
+        TrieNode curr = root;
+        for (char c: word.toCharArray())
+        {
+            curr.child.putIfAbsent(c, new TrieNode());
+
+            curr = curr.child.get(c);
+        }
+
+        curr.words += originalWord + " ";
+    }
+
+    public static void printAnagrams(TrieNode root)
+
+        if (root == null) {
+            return;
+        }
+
+        if (root.words.length() > 1) {
+            System.out.println(root.words);
+        }
+
+        for (TrieNode child: root.child.values()) {
+            printAnagrams(child);
+        }
+    }
+
+    public static void groupAnagrams(String[] words)
+    {
+
+        TrieNode root = new TrieNode();
+
+        for (String word: words)
+        {
+
+            String sorted = Stream.of(word.toCharArray())
+                    .map(chars -> { Arrays.sort(chars); return new String(chars); })
+                    .collect(Collectors.joining());
+ 
+            insert(root, sorted, word);
+        }
+ 
+
+        printAnagrams(root);
+    }
+
+}
+
+Q-5 :- Palindrome Pairs
+class Solution {
+    public List<List<Integer>> palindromePairs(String[] words) {
+        
+        Trie trie = new Trie();
+        int idx = 0;
+        
+        // Add all the words in a Trie
+        for(String word : words){
+            String reversed = new StringBuilder(word).reverse().toString();
+            trie.add(reversed, idx++);
+        }        
+        
+        List<List<Integer>> result = new ArrayList<>();
+        
+        // Search for each word in trie and add them to the list
+        for(int i=0; i < words.length; i++){
+            trie.search(words[i], i, result);
+        }
+        return result;
+    }    
+    class Trie {
+
+        private TrieNode root;
+
+        Trie(){
+            this.root = new TrieNode();
+        }
+
+        public void add(String word, int currWordIdx){
+            TrieNode currNode = root;
+
+            for(int i=0; i < word.length(); i++){
+                if(isRemainingStrPalindrome(word, i))
+                    currNode.palindromeIdxs.add(currWordIdx);
+
+                char c = word.charAt(i);
+                if(!currNode.nodes.containsKey(c))
+                    currNode.nodes.put(c, new TrieNode());
+                currNode = currNode.nodes.get(c);
+            }
+            currNode.wordIdx = currWordIdx;
+        }
+        public void search(String word, int currWordIdx, List<List<Integer>> result){
+            TrieNode currNode = root;
+
+            for(int i=0; i < word.length(); i++){            
+                if(isRemainingStrPalindrome(word, i) && currNode.wordIdx != -1)
+                    result.add(List.of(currWordIdx, currNode.wordIdx));
+                char c = word.charAt(i);
+                currNode = currNode.nodes.get(c);
+                if(currNode == null)
+                    break;
+            }
+
+            if(currNode == null)
+                return;
+
+            if(currNode.wordIdx != -1 && currNode.wordIdx != currWordIdx)
+                result.add(List.of(currWordIdx, currNode.wordIdx));
+
+            for(int otherIdx : currNode.palindromeIdxs)
+                result.add(List.of(currWordIdx, otherIdx));
+        }
+
+        private boolean isRemainingStrPalindrome(String word, int startIdx){        
+            for(int i=startIdx, j=word.length()-1; i < j; i++, j--)
+                if(word.charAt(i) != word.charAt(j))
+                    return false;
+            return true;
+        }
+    }
+
+    class TrieNode {
+        Map<Character, TrieNode> nodes = new HashMap<>();
+        int wordIdx = -1;
+        List<Integer> palindromeIdxs = new ArrayList<>();
+    }
+}
+
+Q-6 :- Phone directory 
+class Solution{
+    static class Node
+    {
+        HashMap<Character,Node> child;
+        boolean end;
+
+        public Node()
+        {
+            child = new HashMap<Character,Node>();
+
+            for (char i = 'a'; i <= 'z'; i++)
+                 child.put(i,null);
+      
+            end = false;
+        }
+    }
+
+    static Node root;
+
+    static void insert(String s)
+    {
+        int len = s.length();
+    
+        Node itr = root;
+        for (int i = 0; i < len; i++)
+        {
+
+            Node nextNode = itr.child.get(s.charAt(i));
+            if (nextNode == null)
+            {
+
+                nextNode = new Node();
+
+                itr.child.put(s.charAt(i),nextNode);
+            }
+    
+            itr = nextNode;
+    
+            if (i == len - 1){
+                itr.end = true;    
+            }
+                    
+        }
+    }
+
+    static void insertIntoTrie(String contacts[])
+    {
+        root = new Node();
+        int n = contacts.length;
+        for (int i = 0; i < n; i++)
+        {
+            insert(contacts[i]);
+        }
+    }
+    static void displayContactsUtil(Node curNode,
+                                   String prefix,ArrayList<String> res)
+    {
+
+        if (curNode.end){
+            res.add(prefix);
+        }
+
+        for (char i = 'a'; i <= 'z'; i++)
+        {
+            Node nextNode = curNode.child.get(i);
+            if (nextNode != null)
+            {
+                displayContactsUtil(nextNode, prefix + i, res);
+            }
+        }
+    }    
+    static ArrayList<ArrayList<String>> displayContacts(int n, 
+                                        String contact[], String s)
+    {
+
+        insertIntoTrie(contact);
+        
+        ArrayList<ArrayList<String>> res =new ArrayList<>();
+        Node prevNode = root;
+        String prefix = "";
+        int len = s.length();
+        int i;
+        for (i = 0; i < len; i++)
+        {
+            ArrayList<String> ans=new ArrayList<>();
+            
+            prefix += s.charAt(i);
+
+            char lastChar = prefix.charAt(i);
+ 
+            Node curNode = prevNode.child.get(lastChar);
+ 
+            if (curNode == null)
+            {
+                ans.add("0");
+                res.add(ans);
+                i++;
+                break;
+            }
+
+            displayContactsUtil(curNode, prefix, ans);
+            
+            res.add(ans);
+            prevNode = curNode;
+        }
+        while(i<len){
+            ArrayList<String> zero=new ArrayList<>();
+            zero.add("0");
+            res.add(zero);
+            i++;
+        }
+        return res;   
+    }    
+}

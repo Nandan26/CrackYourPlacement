@@ -1,0 +1,304 @@
+Q-1 :- Top K freq elements
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int num: nums) {
+            map.put(num, map.getOrDefault(num, 0)+1);
+        }
+        PriorityQueue<Map.Entry<Integer, Integer>> pq = 
+        new PriorityQueue<>((e1, e2) -> e1.getValue()-e2.getValue());
+        for (Map.Entry<Integer, Integer> entry: map.entrySet()) {
+            pq.add(entry);
+            if (pq.size() > k) {
+                pq.poll();
+            }
+        }
+        int[] res = new int[k];
+        int j=0;
+        while (!pq.isEmpty()) {
+            res[j++]=pq.poll().getKey();
+        }
+        return res;
+    }
+}
+
+Q-2 :- Kth largest element in an array
+class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k + 1);
+    
+        for(int el : nums) {
+            pq.add(el);
+            if (pq.size() > k) {
+                pq.poll();
+            }
+        }
+        return pq.poll();
+    }
+}
+
+Q-3 :- Ugly number ||
+class Solution {
+    public int nthUglyNumber(int n) {
+        int[] dp=new int[n+1];
+        dp[1]=1;
+        int p2=1,p3=1,p5=1;
+        for(int i=2;i<=n;i++){
+            int m2=2*dp[p2];
+            int m3=3*dp[p3];
+            int m5=5*dp[p5];
+            
+            int min=Math.min(Math.min(m2,m3),m5);
+            dp[i]=min;
+            if(min==m2){
+                p2++;
+            }
+            if(min==m3){
+                p3++;
+            }
+            if(min==m5) p5++;
+        }
+        return dp[n];
+    }
+}
+
+Q-4 :- Furthest Building You Can Reach
+class Solution {
+    
+    public int furthestBuilding(int[] heights, int bricks, int ladders) {
+
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>((a, b) -> (b - a));
+        
+        for(int i = 0; i < heights.length - 1; i++){
+            int jump = heights[i + 1] - heights[i];
+            
+            if(jump > 0){
+                pq.add(jump);
+                bricks -= jump;
+
+                if(bricks < 0){
+                    
+                    if(ladders <= 0) return i;
+                    
+                    ladders--;
+                    
+                    int max = pq.remove();
+
+                    bricks += max;
+                    
+                }
+            }
+        }
+        
+        return heights.length - 1;
+    }
+}
+
+Q-5 :- Kth Smallest Element in a Sorted Matrix
+class Solution {
+    public int kthSmallest(int[][] matrix, int k) {
+        int n=matrix.length;
+        if(k==1) return matrix[0][0];
+        if (k == n * n) {
+            return matrix[n - 1][n - 1];
+        }
+
+        int l = matrix[0][0];
+        int r = matrix[n - 1][n - 1];
+
+        while(l < r){
+            int m = l + (r - l) / 2;
+
+            if(countLessAndEqual(matrix, m) < k) 
+                l = m + 1;
+            else
+                r = m;
+        }
+        
+        return l; 
+    }
+
+    private int countLessAndEqual(int[][] matrix, int mid) {
+        int count = 0;
+        int n = matrix.length;
+        int row = 0;
+        int col = n - 1;
+        while (row < n && col >= 0) {
+            if (matrix[row][col] > mid) {
+                col--;
+            } else {
+                row++;
+                count += col+1;
+            }
+        }
+        return count;
+    }
+}
+
+Q-6 :- Reorganize String
+class Solution {
+    class pair{
+        char ch;
+        int f;
+        public pair(char ch,int f){
+            this.ch=ch;
+            this.f=f;
+        }
+    }
+    public String reorganizeString(String s) {
+        int[] map=new int[26];
+        StringBuilder ans=new StringBuilder();
+        for(int i=0;i<s.length();i++){
+            map[s.charAt(i)-'a']++;
+        }
+        PriorityQueue<pair> pq=new PriorityQueue<>((a,b)->(b.f-a.f));
+        for(int i=0;i<26;i++){
+            if(map[i]>0){
+                pq.add(new pair((char)('a'+i),map[i]));
+            }
+        }
+       
+        pair block=pq.poll();
+        ans.append(block.ch);
+        block.f--;
+        while(pq.size()>0){
+            pair temp=pq.poll();
+            ans.append(temp.ch);
+            temp.f--;
+            if(block.f>0){
+                pq.add(block);
+            }
+            block=temp;
+        }if(block.f>0){
+            return "";
+        
+        }
+        
+        return ans.toString();
+        
+    }
+}
+
+Q-7 :- Find the Most Competitive Subsequence
+class Solution {
+    public int[] mostCompetitive(int[] nums, int k) {
+        Stack<Integer> st=new Stack<>();
+        st.push(nums[0]);
+        for(int i=1;i<nums.length;i++)
+        {
+            if(st.isEmpty())
+            {
+                st.push(nums[i]);
+                continue;
+            }
+
+             int rem=nums.length-i-1;
+
+            while(st.size()>0 && nums[i]<st.peek() && st.size()+rem>=k)
+            {
+                st.pop();
+            }
+
+            if(st.size()<k)
+            {
+                st.push(nums[i]);
+            }
+        }
+        int ans[]=new int[k];
+        int i=k-1;
+        while(!st.isEmpty())
+        {
+            ans[i--]=st.pop();
+        }
+        return ans;   
+        
+    }
+}
+
+Q-8 :- First Missing Positive
+class Solution {
+    private void swap(int arr[],int i,int j){
+        int temp=arr[i];
+        arr[i]=arr[j];
+        arr[j]=temp;
+    }
+    public int firstMissingPositive(int[] nums) {
+        int i=0;
+        int ans=0;
+        while(i<nums.length){
+            int correct=nums[i]-1;
+            if(nums[i]>0 && nums[i]<nums.length && nums[i]!=nums[correct]){
+                swap(nums,i,correct);
+            }
+            else i++;
+        }
+        
+        for(i=0;i<nums.length;i++){
+            if(nums[i] != i+1){
+                return i+1;
+            }
+
+        }
+        return nums.length+1;
+        
+    }
+}
+
+Q-9 :- Length of the longest subarray with zero Sum
+public class Solution {
+static int solve(int[] a){
+	int  max = 0;
+	for(int i = 0; i < a.length; ++i){
+		int sum = 0;
+		for(int j = i; j < a.length; ++j){
+			sum += a[j];
+			if(sum == 0){
+				max = Math.max(max, j-i+1);
+			}
+		}
+	}
+	return max;
+   }
+}
+
+Q-10 :- K Closest Points to Origin
+class Solution {
+    class pair implements Comparable<pair>{
+        int[] a=new int[2];
+        int dist;
+        pair(int x,int y, int dist){
+            a[0]=x;
+            a[1]=y;
+            this.dist=dist;
+        }
+        //max heap
+        
+        public int compareTo(pair p){
+            return p.dist-this.dist;
+        }
+    }
+    public int[][] kClosest(int[][] points, int k) {
+        PriorityQueue<pair> pq=new PriorityQueue<pair>();
+        
+        for(int i=0;i<points.length;i++){
+            int x=points[i][0];
+            int y=points[i][1];
+            int dis=(int)(Math.pow(x,2)+Math.pow(y,2));
+            
+            pq.add(new pair(x,y,dis));
+            
+            if(pq.size()>k){
+                pq.poll();
+            }
+        }
+        int[][] ans=new int[k][2];
+        int i=0;
+        while(pq.size()>0){
+            pair p1=pq.poll();
+            ans[i][0]=p1.a[0];
+            ans[i][1]=p1.a[1];
+            i++;
+        }
+        return ans;
+    }
+}

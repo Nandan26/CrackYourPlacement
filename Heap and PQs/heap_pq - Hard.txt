@@ -1,0 +1,111 @@
+Q-11 :- Minimum Number of Refueling Stops
+class Solution {
+    public int minRefuelStops(int target, int startFuel, int[][] stations) {
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>(Collections.reverseOrder());
+        int curFuel = startFuel, refuelTime = 0, station = 0;
+        
+        while(pq.size()>=0){
+ 
+            while(station < stations.length && stations[station][0] <= curFuel){
+                pq.offer(stations[station][1]);
+                ++station;
+            }
+            
+            if(curFuel >= target){
+                return refuelTime;
+            }
+            
+            if(pq.isEmpty()){
+                return -1;
+            }
+            curFuel += pq.poll();
+            ++refuelTime;
+        }
+        return -1;
+    }
+}
+
+Q-12 :-  Minimum Cost to Hire K Workers
+class Solution {
+    class Worker {
+        int quality;
+        int wage;
+        double ratio;
+        Worker(int quality, int wage){
+            this.quality = quality;
+            this.wage = wage;
+            this.ratio = this.wage*1.0/this.quality;
+        }
+    }
+    public double mincostToHireWorkers(int[] quality, int[] wage, int k) {
+        List<Worker> workers = new ArrayList<>();
+        for(int i=0; i < quality.length; i++){
+            workers.add(new Worker(quality[i], wage[i]));
+        }
+
+        Collections.sort(workers, (a,b)->Double.compare(a.ratio,b.ratio));
+        PriorityQueue<Worker> pq = new PriorityQueue<>((a,b)-> b.quality-a.quality);
+        double totalQuality = 0, minCost = Double.MAX_VALUE;
+        for(Worker worker : workers){
+            pq.add(worker);
+            totalQuality += worker.quality;
+            if(pq.size() == k){
+                minCost = Math.min(minCost, totalQuality*worker.ratio);
+                totalQuality -= pq.remove().quality;       
+            }
+        }
+        
+        return minCost;
+    }
+}
+
+Q-13 :- Swim in Rising Water
+class Solution {
+    private int[][] dirs = {{1,0},{0,1},{-1,0},{0,-1}};
+    public int swimInWater(int[][] grid) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> a[2]-b[2]);
+        int n=grid.length;
+        boolean[][] visited = new boolean[n][n];
+        visited[0][0] = true;
+        pq.add(new int[] {0, 0, grid[0][0]});
+        while(!pq.isEmpty()) {
+            int[] a = pq.poll();
+            for(int[] d: dirs) {
+                int newx = a[0] + d[0], newy = a[1] + d[1];
+                if(newx < 0 || newx >= n || newy < 0 || newy >= n) continue;
+                if(!visited[newx][newy]) {
+                    visited[newx][newy] = true;
+                    int time = Math.max(a[2], grid[newx][newy]);
+                    if(newx == n-1 && newy == n-1) return time;
+                    pq.add(new int[] {newx, newy, time});
+                }
+            }
+        }
+        return 0;
+    }
+    
+}
+
+Q-14 :- Sliding Window Maximum
+class Solution {
+    public int[] maxSlidingWindow(int[] a, int k) {
+        int n = a.length;
+        int[] r = new int[n - k + 1];
+        int ri = 0;
+        Deque <Integer> q = new ArrayDeque<>();
+        for (int i = 0; i < a.length; i++) {
+            if (!q.isEmpty() && q.peek() == i - k) {
+                q.poll();
+            }
+            while (!q.isEmpty() && a[q.peekLast()] < a[i]) {
+                q.pollLast();
+            }
+
+            q.offer(i);
+            if (i >= k - 1) {
+                r[ri++] = a[q.peek()];
+            }
+        }
+        return r;
+    }
+}
