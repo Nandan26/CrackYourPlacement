@@ -1,0 +1,470 @@
+Q-8 :- Minimum Cost Tree From Leaf Values
+class Solution {
+    public int mctFromLeafValues(int[] arr) {
+        PriorityQueue<Integer> pq=new PriorityQueue<>();
+        
+        for(int a:arr){
+            pq.add(a);
+        }
+        while(pq.size()>1){
+            int a= pq.poll();
+            int b=pq.poll();
+            pq.add(a*b);
+        }
+        return pq.poll();
+    }
+}
+
+Q-9 :- Daily Temperature
+class Solution {
+    public int[] dailyTemperatures(int[] temperatures) {
+        int n=temperatures.length;
+        int[] answer =new int[n];
+        Stack<Integer> st=new Stack<>();
+        st.push(n-1);
+        answer[n-1]=0;
+        for(int i=n-2;i>=0;i--){
+            while((st.size()>0) && (temperatures[st.peek()]<=temperatures[i]) ){
+                answer[i]+=answer[st.peek()];
+                st.pop();
+            }
+            if(st.size()>0) {
+                answer[i]++;
+            }
+            else answer[i]=0;
+            st.push(i);
+        }
+        return answer;
+    }
+}
+
+Q-10 :- Distance of nearest cell having 1
+class Solution {
+    public int[][] updateMatrix(int[][] mat) {
+        int row = mat.length;
+        int col = mat[0].length;
+        Queue<int[]> q = new LinkedList<>();
+        for (int i=0; i<row; i++) {
+            for (int j=0; j<col; j++) {
+                if (mat[i][j] == 0)
+                    q.add(new int []{i, j});
+                else
+                    mat[i][j] = Integer.MAX_VALUE; // to mark it as not visited
+            }
+        }
+        int [][] dirs = new int [][]{{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+        while (!q.isEmpty()) {
+            int[] curr = q.poll();
+            int x = curr[0];
+            int y = curr[1];
+            for (int[] dir : dirs) {
+                int newX = dir[0] + x;
+                int newY = dir[1] + y;
+                if (newX < 0 || newY < 0 || newX >= row || newY >= col || mat[newX][newY] <= mat[x][y] + 1)
+                    continue;
+                q.add(new int [] {newX, newY});
+                mat[newX][newY] = mat[x][y] + 1;
+            }
+        }
+        return mat;
+    }
+}
+
+Q-11 :- Online Stock Span
+class StockSpanner {
+
+    Stack<int[]> stack;
+    
+    public StockSpanner() {
+        stack = new Stack<>();
+    }
+    
+    public int next(int price) {
+        int count = 1;
+        while(!stack.isEmpty() && stack.peek()[0]<= price){
+            count+=stack.pop()[1];
+        }
+        stack.push(new int[]{price, count});
+        return count;
+    }
+}
+
+Q-12 :- rotten Oranges
+class Solution {
+    public int orangesRotting(int[][] grid) {
+     
+        int i,j,x,y,n=grid.length;
+        int m=grid[0].length;
+        int ans=0,fresh=0;
+        Queue<int[]> queue=new LinkedList();
+        int[][] dirs={{-1,0},{1,0},{0,1},{0,-1}};
+        
+        for(i=0;i<n;i++)
+            for(j=0;j<m;j++) {
+                if(grid[i][j]==2) {
+
+                    queue.add(new int[]{i,j});  
+                    
+                }
+                else if(grid[i][j]==1)
+                    fresh++;
+			}
+        if(fresh==0) return 0;
+        
+        int time=-1;
+        while(!queue.isEmpty())  {
+            
+            int size=queue.size();
+            time++;
+
+            while(size-->0)
+            {
+                int tm[]=queue.poll();
+                x=tm[0];
+                y=tm[1];
+                for(i=0;i<dirs.length;i++){
+                    int newx=x+dirs[i][0];
+                    int newy=y+dirs[i][1];
+                    if(newx>=0 && newy>=0 && newx<n && newy<m && grid[newx][newy]==1 ){
+                        
+                        queue.add(new int[]{newx,newy});  
+                        grid[newx][newy]=2;
+                        fresh--;
+                    }
+                }
+
+            }
+            
+        }
+        
+        if(fresh>0)
+            return -1;
+        return time;
+    }
+}
+
+Q-13 :- Sum of Subarray Minimums
+class Solution {
+    public int sumSubarrayMins(int[] arr) {
+        long res = 0;
+        Deque<Integer> q = new LinkedList<>();
+        for(int i = 0; i <= arr.length; i++) {
+            while(!q.isEmpty() && (i == arr.length || arr[q.peekLast()] > arr[i])) {
+                int mid = q.pollLast();
+                int L = mid - (q.isEmpty() ? -1 : q.peekLast());
+                int R = i - mid;
+                res += (long) arr[mid] * L * R;
+            }
+            q.addLast(i);
+        }
+        return (int) (res % 1000000007);
+    }
+}
+
+Q-14 :- Evaluate Reverse Polish Notation
+class Solution {
+    public int evalRPN(String[] tokens) {
+        Stack<Integer> st=new Stack<>();
+         
+
+        for(int i=0;i<tokens.length();i++)
+        {
+            char c=tokens.charAt(i);
+             
+
+            if(Character.isDigit(c))
+            st.push(c - '0');
+
+            else
+            {
+                int val1 = st.pop();
+                int val2 = st.pop();
+                 
+                switch(c)
+                {
+                    case '+':
+                    st.push(val2+val1);
+                    break;
+                     
+                    case '-':
+                    st.push(val2- val1);
+                    break;
+                     
+                    case '/':
+                    st.push(val2/val1);
+                    break;
+                     
+                    case '*':
+                    st.push(val2*val1);
+                    break;
+              
+                }
+            }
+        }
+        return st.pop();   
+    }
+}
+
+Q-15 :- Circular tour 
+class Solution {
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int cur_gas=0;
+	    int ans=0,total_gas=0,total_cost=0;
+	    for(int i:gas) total_gas+=i;
+        for(int i:cost) total_cost+=i;
+        if(total_gas<total_cost) return -1;
+        for(int i=0;i<gas.length;i++){
+	        cur_gas+=gas[i]-cost[i];
+	        if(cur_gas < 0){
+	            ans=i+1; //start again
+	            cur_gas=0;
+	        }
+         }
+         return ans;
+    }
+}
+
+Q-16 :- Remove All Adjacent Duplicates in String || 
+class Solution {
+    public String removeDuplicates(String s, int k) {
+        Stack<Character> st=new Stack<>();
+        Stack<Integer> ct=new Stack<>();
+        int cnt=0;
+        for(char ch:s.toCharArray()){
+            if(st.isEmpty()){
+                st.push(ch);
+                cnt++;
+                ct.push(cnt);
+            }
+            else {
+                if(st.peek()==ch){
+                    st.push(ch);
+                    cnt++;
+                    ct.push(cnt);
+                    //System.out.println("when matches"+cnt);
+                    if(cnt==k){
+                        int temp=k;
+                        while(temp!=0){
+                            st.pop();
+                            ct.pop();
+                            temp--;
+                        }
+                        if(ct.isEmpty()) cnt=0;
+                        else cnt=ct.peek();
+                    }
+                }
+                else{
+                    st.push(ch);
+                    cnt=1;
+                    ct.push(cnt);
+                    //System.out.println(cnt);
+                }
+            }
+        }
+        StringBuilder sb=new StringBuilder();
+        while(!st.isEmpty()){
+            sb.append(st.pop());
+        }
+        return sb.reverse().toString();
+    }
+}
+
+Q-17 :- Flatten Nested List Iterator
+public class NestedIterator implements Iterator<Integer> {
+
+    private List<Integer> intList = new ArrayList<>();
+    private int i = 0;
+    public NestedIterator(List<NestedInteger> nestedList) {
+        for (NestedInteger nestedInteger : nestedList) {
+            flatten(nestedInteger);
+        }
+    }
+
+    @Override
+    public boolean hasNext() {
+        return i < intList.size();
+    }
+
+    @Override
+    public Integer next() {
+        return intList.get(i++);
+    }
+    
+    private void flatten(NestedInteger nested) {
+        if (nested.isInteger()) 
+            intList.add(nested.getInteger());
+        else 
+            for (NestedInteger nestedFromList : nested.getList()) {
+                flatten(nestedFromList);
+        }
+    }
+}
+
+Q-18 :- Find maximum of minimum for every window size in a given array
+class Solution {
+    public int[] MaxOfMin(int n)
+    {
+        Stack<Integer> s = new Stack<>();
+      
+        int left[] = new int[n+1]; 
+        int right[]  = new int[n+1];
+      
+        for (int i=0; i<n; i++)
+        {
+            left[i] = -1;
+            right[i] = n;
+        }
+     
+        for (int i=0; i<n; i++)
+        {
+            while (!s.empty() && arr[s.peek()] >= arr[i])
+                s.pop();
+      
+            if (!s.empty())
+                left[i] = s.peek();
+      
+            s.push(i);
+        }
+      
+        while (!s.empty())
+            s.pop();
+      
+
+        for (int i = n-1 ; i>=0 ; i-- )
+        {
+            while (!s.empty() && arr[s.peek()] >= arr[i])
+                s.pop();
+      
+            if(!s.empty())
+                right[i] = s.peek();
+      
+            s.push(i);
+        }
+      
+        int ans[] = new int[n+1];
+        for (int i=0; i<=n; i++)
+            ans[i] = 0;
+
+        for (int i=0; i<n; i++)
+        {
+            int len = right[i] - left[i] - 1;
+      
+            ans[len] = Math.max(ans[len], arr[i]);
+        }
+        
+        for (int i=n-1; i>=1; i--)
+            ans[i] = Math.max(ans[i], ans[i+1]);
+        
+        return ans;
+      
+    }
+}
+
+Q-19 :- The LRU Cache
+class LRUCache {
+    class Node {
+        Node prev, next;
+        int key, value;
+        Node(int _key, int _value) {
+            key = _key;
+            value = _value;
+        }
+    }
+    Node head = new Node(0, 0);
+    Node tail = new Node(0, 0);
+    Map<Integer,Node> map = new HashMap();
+    int capacity;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    public int get(int key) {
+        if (map.containsKey(key)) {
+            Node node = map.get(key);
+            remove(node);
+            insert(node);
+            return node.value;
+        } else {
+            return -1;
+        }
+    }
+
+    public void put(int key, int value) {
+        if (map.containsKey(key)) {
+            remove(map.get(key));
+        }
+        if (map.size() == capacity) {
+            remove(tail.prev);
+        }
+        insert(new Node(key, value));
+    }
+
+    private void remove(Node node) {
+        map.remove(node.key);
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void insert(Node node) {
+        map.put(node.key, node);
+        node.next = head.next;
+        node.next.prev = node;
+        head.next = node;
+        node.prev = head;
+    }
+}
+
+Q-20 :- The Celebrity Problem
+class Solution{
+    public int findCelebrity(int n,int[][] celebrity)
+    {
+        Stack<Integer> st = new Stack<>();
+        int c;
+ 
+
+        for (int i = 0; i < n; i++)
+        {
+            st.push(i);
+        }
+ 
+        while (st.size() > 1)
+        {
+
+            int a = st.pop();
+            int b = st.pop();
+ 
+
+            if (knows(a, b, celebrity))
+            {
+                st.push(b);
+            }
+ 
+            else
+                st.push(a);
+        }
+       
+
+        if(st.empty())
+            return -1;
+ 
+        c = st.pop();
+
+        for (int i = 0; i < n; i++)
+        {
+
+            if (i != c && (knows(c, i, celebrity) || !knows(i, c, celebrity)))
+                return -1;
+        }
+        return c;
+    }
+    
+    private boolean knows(int a, int b,int[][] matrix)
+    {
+        boolean ans = (matrix[a][b] == 1)?true : false;
+        return ans;
+    }
+}
+ 
