@@ -1,0 +1,361 @@
+Q-21 :- Optimal BST
+class Solution{
+	public int optimalbst(int[] keys, int[] frequency, int n) {
+		int[] fsum = new int[n];
+		for (int i = 0; i < n; i++) {
+			if (i == 0) {
+				fsum[i] = frequency[i];
+			} else {
+				fsum[i] = frequency[i] + fsum[i - 1];
+			}
+		}
+
+		int[][] cost = new int[n][n];
+		for (int gap = 0; gap < n; gap++) {
+			int si = 0;
+			int ei = gap;
+			while (ei < n) {
+				if (gap == 0) {
+					// diagonal
+					cost[si][ei] = frequency[si];
+				} else if (gap == 1) {
+					int sum = fsum[ei];
+					if (si - 1 >= 0) {
+						sum -= fsum[si - 1];
+					}
+					cost[si][ei] = Math.min(cost[si][ei - 1], cost[si + 1][ei]) + sum;
+				} else {
+					cost[si][ei] = Integer.MAX_VALUE;
+					int sum = fsum[ei];
+					if (si - 1 >= 0) {
+						sum -= fsum[si - 1];
+					}
+					for (int i = si; i < ei - 1; i++) {
+						cost[si][ei] = Math.min(cost[si][i] + cost[i + 2][ei] + sum, cost[si][ei]);
+					}
+					cost[si][ei] = Math.min(Math.min(cost[si][ei - 1], cost[si + 1][ei]) + sum, cost[si][ei]);
+				}
+				si++;
+				ei++;
+			}
+		}
+		return cost[0][n - 1];
+	}
+}
+
+Q-22 :- Frog Jump
+class Solution {
+    public boolean canCross(int[] stones) {
+        HashMap<Integer,HashSet<Integer>> map=new HashMap<>();
+        
+        for(int i=0;i<stones.length;i++){
+            map.put(stones[i],new HashSet<>());
+        }
+        
+        map.get(stones[0]).add(1);
+        
+        for(int i=0;i<stones.length;i++){
+            int currst=stones[i];
+            
+            for(int a:map.get(currst)){
+                int jump=currst+a;
+                if(jump==stones[stones.length-1]) return true;
+                if(map.containsKey(jump)){
+                    if(a-1>0)
+                        map.get(jump).add(a-1);
+                    map.get(jump).add(a);
+                    map.get(jump).add(a+1);
+                }
+            }
+        }
+        return false;
+    }
+}
+
+Q-23 :- Best Time to Buy and Sell Stock IV
+class Solution {
+    public int maxProfit(int k, int[] prices) {
+        int[][] dp=new int[k+1][prices.length+1];
+        int max=0;
+        for(int t=1;t<=k;t++){
+            for(int d=1;d<prices.length;d++){
+                max=dp[t][d-1];
+                for(int pd=0;pd<d;pd++){
+                    int ptill=dp[t-1][pd];
+                    int pro=prices[d]-prices[pd];
+                    
+                    max=Math.max(max,ptill+pro);
+                }
+                
+                dp[t][d]=max;
+            }
+        }
+        return max;
+    }
+}
+
+Q-24 :- Minimum Insertion Steps to Make a String Palindrome
+class Solution {
+    public int minInsertions(String s) {
+        StringBuilder sb=new StringBuilder(s);
+        String reverse=sb.reverse().toString();
+        int n=s.length();
+        
+        int dp[][]=new int[n+1][n+1];
+        for(int i=1;i<n+1;i++)
+        {
+            for(int j=1;j<n+1;j++)  
+            {
+                if(s.charAt(i-1)==reverse.charAt(j-1))
+                    dp[i][j]=1+dp[i-1][j-1];
+                else
+                    dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]);
+              
+            }
+        }
+        return n-dp[n][n];
+    }
+}
+
+Q-25 :- Largest area rectangular sub-matrix with equal number of 1’s and 0’s
+class Solution {
+    public int largestAreaRectangularSubMatrixWithEqualNumberOf1sAnd0s (int[][] matrix, int n, int m){
+
+        int[][] prefixSum = new int[n][m];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++)
+                prefixSum[i][j] = matrix[i][j];
+        }
+        
+        for(int i=0;i<n;i++){
+            for(int j=1;j<m;j++)
+                prefixSum[i][j] += prefixSum[i][j-1];
+        }
+    
+        int startCol = 0, endCol = 0, startRow = 0, endRow = 0;
+        int maxSize = 0;
+        for(int firstCol=0;firstCol<m;firstCol++){
+            for(int secondCol=firstCol;secondCol<m;secondCol++){
+                int tmp[] = new int[n]; // stores the sum between two columns for each row
+
+                for(int row=0;row<n;row++)
+                    tmp[row] = prefixSum[row][secondCol] - (firstCol>0 ? prefixSum[row][firstCol-1] : 0);
+                
+                int curSum = 0;
+                HashMap<Integer, Integer> rowSumMap = new HashMap<Integer, Integer>();
+                rowSumMap.put(0,-1);
+                for(int curRow=0;curRow<n;curRow++){
+                    curSum += tmp[curRow];
+                    if(rowSumMap.containsKey(curSum)) {
+                        int subMatrixSize = (secondCol - firstCol + 1)*(curRow - rowSumMap.get(curSum));
+                        if(subMatrixSize > maxSize){
+                            maxSize = subMatrixSize;
+                            startCol = firstCol;
+                            endCol = secondCol;
+                            startRow = rowSumMap.get(curSum) + 1;
+                            endRow = curRow;
+                        }
+                    } else {
+                        rowSumMap.put(curSum,curRow);
+                    }
+                }
+            }
+        }
+
+        return maxSize;
+    }
+}
+
+Q-26 :- Trapping Rain Water
+class Solution {
+    public int trap(int[] height) {
+	    int n = height.length; 
+	    int left=0; int right=n-1;
+        int totalwater=0;
+        int maxleft=0, maxright=0;
+	        
+	    while(left<=right){
+	            
+            if(height[left]<height[right]){
+	                
+                if(height[left]>=maxleft) maxleft=height[left];
+	            else totalwater+=maxleft-height[left];
+	                
+	            left++;
+	        }
+            else{	                
+                if(height[right]>=maxright) maxright= height[right];
+                else totalwater+=maxright-height[right];
+	                
+	            right--;
+	        }
+	    }
+	    return totalwater;
+
+    }
+}
+
+Q-27 :- minimum cost to merge stones
+class Solution {
+    public int mergeStones(int[] stones, int K) {
+        int n = stones.length;
+        if ((n - 1) % (K - 1) != 0) return -1;
+        int[][] dp = new int[n][n];  
+        int[] prefixSum = new int[n + 1];
+        
+        for (int i = 1; i < n + 1; ++i) { 
+            prefixSum[i] = prefixSum[i - 1] + stones[i - 1];
+        }
+        
+        for (int len = K; len <= n; ++len) {
+            
+            for (int i = 0; i + len - 1 < n; ++i) {
+                int j = i + len - 1;
+                dp[i][j] = Integer.MAX_VALUE;
+                int l = (len - 1) % (K - 1) == 0 ? len - (K - 1) : len; 
+                for (int k = 0; k <= len - 2; ++k) {
+                    
+                    if (k / (K - 1) + (len - 2 - k) / (K - 1) == (l - 1) / (K - 1)) {
+                        
+                        int curCost = dp[i][k + i] + dp[k + i + 1][j];
+                        dp[i][j] = Math.min(dp[i][j], curCost);
+                    }
+                }
+                if ((len - 1) % (K - 1) == 0) dp[i][j] += prefixSum[j + 1] - prefixSum[i];
+            }
+        }
+        return dp[0][n - 1];
+    }
+}
+
+Q-28 :- Count Different Palindromic Subsequences
+class Solution {
+    public int countPalindromicSubsequences(String s) {
+        int n = s.length();
+        boolean[][] dp = new boolean[n][n];
+        int count = 0;
+        
+        for(int gap=0; gap<n; gap++){
+            for(int i=0, j=gap; j<dp.length; i++,j++){
+                if(gap==0){
+                    dp[i][j]=true;
+                }else if(gap==1){
+                    if(s.charAt(i)==s.charAt(j)){
+                        dp[i][j]=true;
+                    }else{
+                        dp[i][j]=false;
+                    }
+                }
+                else{
+                    if(s.charAt(i)==s.charAt(j) && dp[i+1][j-1]==true){
+                        dp[i][j]=true;
+                    }else{
+                        dp[i][j]=false;
+                    }
+                }
+                if(dp[i][j]){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+}
+
+Q-29 :- maximal Rectangle
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+	    int m = matrix.length;
+        if( m==0 ) return 0;
+        int n = matrix[0].length;
+
+		int i, j, ans = 0;
+		int[] heights = new int[n];
+		for (i = 0; i < m; i++) {
+			for (j = 0; j < n; j++) {
+				if (matrix[i][j] == '0')
+					heights[j] = 0;
+				else
+					heights[j] += 1;
+			}
+			ans = Math.max(ans, MAH(heights));
+		}
+
+		return ans;
+	}
+
+    private int MAH(int nums[]){
+        int n= nums.length;
+        int ans = 0;
+        Stack<Integer> stack = new Stack<>();
+        int left[] = new int[n];
+        int right[] = new int[n];
+        for (int i = 0; i < n; i++) {
+            left[i] = -1;
+        }
+        for (int i = 0; i < n; i++) {
+            right[i] = n;
+        }
+        for (int i = n-1; i >=0; i--) {
+            while (!stack.isEmpty()&&nums[stack.peek()]>=nums[i]) {                     
+                left[stack.pop()] = i;
+            }
+            stack.add(i);
+        }
+        stack.clear();
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty()&&nums[stack.peek()]>nums[i]) {                     
+                right[stack.pop()] = i;
+            }
+            stack.add(i);
+        }
+        for (int i = 0; i < n; i++) {
+            ans = Math.max(ans, (right[i]-left[i]-1)*nums[i]);
+        }
+        return ans;
+    }
+
+}
+
+Q-30 :- Burst Baloons
+class Solution {
+    public int maxCoins(int[] nums) {
+        int[][] dp=new int[nums.length][nums.length];
+        
+        for(int g=0;g<nums.length;g++){
+            for(int i=0,j=g;j<nums.length;i++,j++){
+                int max=Integer.MIN_VALUE;
+                for(int k=i;k<=j;k++){
+                    int left= k==i?0:dp[i][k-1];
+                    int right= k==j?0:dp[k+1][j];
+                    
+                    int val=(i==0?1:nums[i-1])*nums[k]*(j==nums.length-1?1:nums[j+1]);
+                    
+                    int total=val+right+left;
+                    
+                    if(total>max){
+                        max=total;
+                    }
+                }
+                dp[i][j]=max;
+            }
+        }
+        return dp[0][nums.length-1];
+    }
+}
+
+Q-31 :- Super egg Drop
+class Solution {
+    public int superEggDrop(int n, int k) {
+        int [][] dp = new int[n+1][k+1];
+        int m = 0;
+        while (dp[n][m] < k) {
+            m += 1;
+            for (int egg=1; egg<=n; egg++) {
+                dp[egg][m] = dp[egg][m-1] + dp[egg-1][m-1] + 1;
+            }
+        }
+        return m;
+    }
+}
+  
